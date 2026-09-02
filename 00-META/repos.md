@@ -4,7 +4,8 @@ The map of every repository in the HITS project: what each owns and how it relat
 
 | Repository | Owns |
 |---|---|
-| `hits-hq` | This repo — mission, research, design, decisions, issue diagnosis. The source of truth. The only repository that exists today. |
+| `hits-hq` | This repo — mission, research, design, decisions, issue diagnosis. The source of truth. |
+| `hits` | The product code: the `hits` CLI, the public Go `client` package, and the `hits-node` micro service. Started as a walking skeleton; designed capabilities land here through [playbook 04](process/04-build-handoff.md). |
 
 ## Foreseen components (not yet repos)
 
