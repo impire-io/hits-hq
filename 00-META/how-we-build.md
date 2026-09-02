@@ -124,15 +124,15 @@ where it is made and visible from the moment it is started.
 
 - **One work ID names everything.** A single string — taken only from a record
   that already exists, or a bare descriptive slug — is the branch name in every
-  repo the change touches, the workspace directory, and the MR label.
+  repo the change touches, the workspace directory, and the PR label.
 
-- **The draft MR is the claim, and it opens on the first push.** Work is pushed
-  as it is made; the MR exists from the beginning of the work, so one query
-  answers what everyone is working on. An agent may open, push, and flip the MR
+- **The draft PR is the claim, and it opens on the first push.** Work is pushed
+  as it is made; the PR exists from the beginning of the work, so one query
+  answers what everyone is working on. An agent may open, push, and flip the PR
   out of draft; **merging stays with a human.**
 
 - **Cross-repo landing order is declared, not inferred.** A change spanning
   repos carries an ordered `lands:` block on its hits-hq work item. hits-hq
-  states the plan; the forge holds the live state.
+  states the plan; GitHub holds the live state.
 
 The executable steps are [playbook 07](process/07-parallel-work.md).

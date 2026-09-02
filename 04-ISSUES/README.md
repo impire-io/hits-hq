@@ -25,7 +25,7 @@ blocked-by:          # only with status: blocked — the thing being waited on
 located-in:          # [repo, ...] once the owner is known (tasks open with this set)
 discovered-while:    # tasks, optional — the context it was noticed in
 lands:               # cross-repo fixes only: the ordered landing block (playbook 07)
-fixed-by:            # on close — verifiable refs (commit/MR), plus action: deploy entries with evidence
+fixed-by:            # on close — verifiable refs (commit/PR), plus action: deploy entries with evidence
 amended-design:      # on close, where the fix was a design amendment
 resolved:            # YYYY-MM-DD, with status: resolved
 ---
