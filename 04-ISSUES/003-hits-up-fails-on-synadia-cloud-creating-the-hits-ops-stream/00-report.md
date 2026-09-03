@@ -2,6 +2,8 @@
 kind: bug
 status: open
 discovered-while: first real run of the v0.1.0-rc.1 release candidate against Synadia Cloud
+claimed-by: Daan Gerits
+claimed: 2026-09-03
 ---
 
 # 003-hits-up-fails-on-synadia-cloud-creating-the-hits-ops-stream
