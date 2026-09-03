@@ -2,6 +2,8 @@
 kind: bug
 status: open
 discovered-while: validating the v0.1.0-rc.2 release of the issue 003 fix on Synadia Cloud
+claimed-by: Daan Gerits
+claimed: 2026-09-03
 ---
 
 # 004-hits-up-on-synadia-cloud-fails-partway-on-connection
