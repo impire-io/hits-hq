@@ -5,6 +5,11 @@ updated: 2026-09-03
 lands:
 ---
 
+> **Where this stands:** `hits-node` and the `hits` service run on `hits`
+> main (spec 001, PR impire-io/hits#1). The three index services are not yet
+> built; each lands through its own spec. This doc flips to `implemented`
+> when the last of them runs on main.
+
 # The service fleet
 
 Four binaries, four NATS micro services, one repo. Settled by decision
