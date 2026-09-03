@@ -1,5 +1,5 @@
 ---
-status: implemented
+status: in-progress
 code: hits
 updated: 2026-09-03
 lands:
@@ -17,7 +17,15 @@ describe is [`item-model.md`](item-model.md); who reads and writes them is
 ## Stream and subjects
 
 One JetStream stream, `hits-ops`, capturing `hits.ops.>`, file-backed,
-unlimited retention — items are kept forever, so their ops are too.
+with a declared byte budget and `DiscardNew` (decision
+[0005](../03-DECISIONS/0005-byte-budgets.md)): 1 GiB by default,
+`--max-bytes` to change it, and at the cap appends are refused loudly —
+the operator raises the budget; history is never trimmed. Items are kept
+forever, so their ops are too — the budget bounds growth, not memory. The
+projection buckets carry budgets of their own (a quarter of the ops
+budget for `hits-items`, 8 MiB for the small buckets); some accounts
+(Synadia Cloud among them) require every stream to declare one, and HITS
+declares them on every account so there is one shape everywhere.
 
 Every op for an entity is published to exactly one subject:
 

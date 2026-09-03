@@ -1,5 +1,5 @@
 ---
-status: implemented
+status: in-progress
 code: hits
 updated: 2026-09-03
 ---
@@ -44,8 +44,15 @@ denials stay untouched. `up`'s flags follow the subcommand, under its own
 flagset:
 
 ```
-hits up [--context <name>] [--embedding-url <url> --embedding-model <m>]
+hits up [--context <name>] [--max-bytes <size>]
+        [--embedding-url <url> --embedding-model <m>]
 ```
+
+Provisioning declares byte budgets (decision
+[0005](../03-DECISIONS/0005-byte-budgets.md)): the ops stream defaults to
+1 GiB with refuse-when-full semantics, `--max-bytes` changes it. Some
+accounts — Synadia Cloud among them — require the budget; HITS declares it
+everywhere.
 
 ## Connections
 

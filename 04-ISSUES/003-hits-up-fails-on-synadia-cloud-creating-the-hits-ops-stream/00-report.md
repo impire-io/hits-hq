@@ -1,9 +1,14 @@
 ---
 kind: bug
-status: open
+status: located
+located-in: [hits]
 discovered-while: first real run of the v0.1.0-rc.1 release candidate against Synadia Cloud
 claimed-by: Daan Gerits
 claimed: 2026-09-03
+lands:
+  - { repo: hits-hq, pr: "", after: [] }
+  - { repo: hits,    pr: "", after: [hits-hq] }
+  - { repo: hits-hq, pr: "", after: [hits], closes: true }
 ---
 
 # 003-hits-up-fails-on-synadia-cloud-creating-the-hits-ops-stream
