@@ -7,7 +7,7 @@ claimed-by: Daan Gerits
 claimed: 2026-09-03
 lands:
   - { repo: hits-hq, pr: "", after: [] }
-  - { repo: hits,    pr: "", after: [hits-hq] }
+  - { repo: hits,    pr: "#9", after: [hits-hq] }
   - { repo: hits-hq, pr: "", after: [hits], closes: true }
 ---
 
