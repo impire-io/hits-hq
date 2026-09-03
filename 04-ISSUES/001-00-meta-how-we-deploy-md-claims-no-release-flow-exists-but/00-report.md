@@ -3,6 +3,8 @@ kind: task
 status: open
 located-in: [hits-hq]
 discovered-while: research 001 (single-binary onboarding), verifying the download-a-binary story against hits main
+claimed-by: Daan Gerits
+claimed: 2026-09-03
 ---
 
 # 001-00-meta-how-we-deploy-md-claims-no-release-flow-exists-but
