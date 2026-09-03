@@ -1,5 +1,5 @@
 ---
-status: implemented
+status: in-progress
 code: hits
 updated: 2026-09-03
 ---
@@ -24,7 +24,7 @@ flowchart LR
     F -->|Start| G[hits-index-graph]
     F -->|Start| S[hits-index-search]
     F -->|Start| E[hits-index-semantic, when configured]
-    N & G & S & E -->|own connection, own nats.Name| NATS[(the NATS system)]
+    N & G & S & E -->|one shared connection: hits-up| NATS[(the NATS system)]
     CP --> NATS
 ```
 
@@ -56,11 +56,16 @@ everywhere.
 
 ## Connections
 
-Each service connects for itself, through the same NATS context, under its
-standalone `nats.Name` (`hits-node`, `hits-index-graph`, …). Server-side,
-`hits up` is indistinguishable from running four binaries: a packaging
-change, not a topology change. Monitoring, per-service disconnects, and the
-account's connection view all match the separate-binary shape.
+All four services share **one** connection, opened through the NATS
+context under `nats.Name("hits-up")` (decision
+[0006](../03-DECISIONS/0006-shared-connection-in-up.md), superseding
+0004's per-service stance). Micro services multiplex on one connection by
+design, and micro discovery still lists the four services individually —
+but the whole platform now costs a single connection, plus one for the
+client operating it: two concurrent, bootable on accounts with the
+smallest connection allowances (issue 004 was Synadia Cloud refusing the
+third of four). The standalone fleet binaries are separate processes and
+keep their own connections and names.
 
 ## The semantic index is optional here
 
