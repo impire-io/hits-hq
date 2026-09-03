@@ -109,10 +109,14 @@ All four binaries live in the `hits` repo, and stay cleanly separated:
 
 - one `cmd/` entry and one package tree per service;
 - a single shared **contract package** — the op envelope, the item model, the
-  invariants — that every service imports;
+  invariants, the ops-log names — that every service imports;
 - **no service imports another**, and nothing outside a service's tree
-  imports its internals. The boundary is enforced by lint in CI, not by
-  convention, so extracting a service into its own repo later is mechanical.
+  imports its internals — with one named exception: `internal/fleet`, the
+  composition root behind `hits up` ([`hits-up.md`](hits-up.md), decision
+  [0004](../03-DECISIONS/0004-hits-up.md)), calls the services' `Start`
+  entrypoints and nothing deeper. The boundary is enforced by lint in CI,
+  not by convention, so extracting a service into its own repo later is
+  mechanical.
 
 Whether the shared bootstrap (connection, config, micro scaffolding) becomes
 a platform library is still open ([`repos.md`](../00-META/repos.md)); it

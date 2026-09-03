@@ -1,6 +1,6 @@
 ---
-status: active
-became:
+status: graduated
+became: ../../02-DESIGN/hits-up.md
 ---
 
 # 001 — Single-binary onboarding against an existing NATS system
@@ -42,4 +42,6 @@ indexers by hand.
 proposes the answers: `hits up` as a subcommand of the one `hits` binary,
 composed through a bounded `internal/fleet` tree, semantic optional at the
 `up` surface, an embedded NATS server as a recorded non-goal, and one HITS
-per account with no prefix knob. Awaiting review before graduation.
+per account with no prefix knob. Graduated as decision
+[0004](../../03-DECISIONS/0004-hits-up.md) and design
+[`hits-up.md`](../../02-DESIGN/hits-up.md).
