@@ -5,12 +5,12 @@ The map of every repository in the HITS project: what each owns and how it relat
 | Repository | Owns |
 |---|---|
 | `hits-hq` | This repo — mission, research, design, decisions, issue diagnosis. The source of truth. |
-| `hits` | The product code: the `hits` CLI (the terminal view of the full client surface — item verbs, projects, search, semantic, graph), the public Go `client` package, and the service fleet — `hits-node` plus the three index services (`hits-index-graph`, `hits-index-search`, `hits-index-semantic`), separate binaries with lint-enforced boundaries per [`02-DESIGN/services.md`](../02-DESIGN/services.md). Started as a walking skeleton; designed capabilities land here through [playbook 04](process/04-build-handoff.md). |
+| `hits` | The product code: the `hits` CLI (the terminal view of the full client surface — item verbs, projects, search, semantic, graph), the `hits-mcp` MCP server (the agent action surface, [`02-DESIGN/mcp-server.md`](../02-DESIGN/mcp-server.md)), the public Go `client` package, and the service fleet — `hits-node` plus the three index services (`hits-index-graph`, `hits-index-search`, `hits-index-semantic`), separate binaries with lint-enforced boundaries per [`02-DESIGN/services.md`](../02-DESIGN/services.md). Started as a walking skeleton; designed capabilities land here through [playbook 04](process/04-build-handoff.md). |
 
 The component split was settled by decision [0001](../03-DECISIONS/0001-item-store-architecture.md): the projector and client API sketched earlier are one service (`hits-node`), and the query projections are the three index services rather than in-process views of the client API.
 
 ## Foreseen components (not yet repos)
 
-The MCP server was foreseen here and settled by decision [0003](../03-DECISIONS/0003-mcp-server.md): it is `hits` code (`cmd/hits-mcp`), designed in [`02-DESIGN/mcp-server.md`](../02-DESIGN/mcp-server.md), not a repo of its own.
+The MCP server was foreseen here and settled by decision [0003](../03-DECISIONS/0003-mcp-server.md) into `hits` code (`cmd/hits-mcp`), where it now runs — see the `hits` row.
 
 Also open: whether a shared platform library (the common bootstrap for the Go fleet) precedes the first service, or is extracted from it later.
