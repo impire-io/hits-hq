@@ -11,6 +11,6 @@ The component split was settled by decision [0001](../03-DECISIONS/0001-item-sto
 
 ## Foreseen components (not yet repos)
 
-- **MCP server** — the agent action surface; a client of the `hits` service fleet, not a privileged component.
+The MCP server was foreseen here and settled by decision [0003](../03-DECISIONS/0003-mcp-server.md): it is `hits` code (`cmd/hits-mcp`), designed in [`02-DESIGN/mcp-server.md`](../02-DESIGN/mcp-server.md), not a repo of its own.
 
 Also open: whether a shared platform library (the common bootstrap for the Go fleet) precedes the first service, or is extracted from it later.
