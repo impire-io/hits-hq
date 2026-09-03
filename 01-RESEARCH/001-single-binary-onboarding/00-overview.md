@@ -35,7 +35,11 @@ indexers by hand.
 - [`00-META/how-we-deploy.md`](../../00-META/how-we-deploy.md) — the
   download-a-binary story is the first real distribution story; the doc
   currently says no release flow exists, which is stale (the repo ships
-  goreleaser and a release workflow).
+  goreleaser and a release workflow — sync filed as issue 001).
 
 [`01-current-state.md`](01-current-state.md) records what already exists on
-`hits` main and the open questions.
+`hits` main and the open questions. [`02-proposal.md`](02-proposal.md)
+proposes the answers: `hits up` as a subcommand of the one `hits` binary,
+composed through a bounded `internal/fleet` tree, semantic optional at the
+`up` surface, an embedded NATS server as a recorded non-goal, and one HITS
+per account with no prefix knob. Awaiting review before graduation.

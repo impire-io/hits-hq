@@ -14,9 +14,12 @@ Verified against `hits` main, 2026-09-03.
   stream and the KV buckets on boot (`CreateOrUpdateStream`,
   `CreateOrUpdateKeyValue`), so a fresh JetStream-enabled account bootstraps
   itself; no separate provisioning step exists or is needed.
-- **Binaries are already downloadable.** The repo carries a goreleaser
-  config and a release workflow. (`how-we-deploy.md` still says no release
-  flow exists — stale, flag for correction.)
+- **A release flow exists, but ships only part of the fleet.** goreleaser
+  and a release workflow are in place, yet they build only `hits` and
+  `hits-node` — the three indexers and `hits-mcp` are not shipped, so a
+  release consumer cannot actually run HITS from downloads today.
+  (`how-we-deploy.md` still says no release flow exists — the sync is filed
+  as issue 001.)
 
 ## The gap
 
