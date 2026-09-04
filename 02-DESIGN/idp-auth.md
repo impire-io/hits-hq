@@ -109,8 +109,21 @@ Failure modes degrade in order, and the loop is self-healing:
   boundary, reconnect fires the handler, the handler refreshes. The loop
   closes with HITS scheduling nothing.
 
-Concurrent one-shot CLI calls may refresh in parallel; last write wins and
-both tokens are valid — the cache write is atomic (rename), nothing more.
+Several processes share one cache: `hits-mcp` and `hits up` hold a context
+long-lived while one-shot CLI calls come and go beside them. Refresh is
+therefore **serialized, not merely atomic**: the handler takes a file lock
+on the cache entry, re-checks freshness once it holds the lock (another
+process may have refreshed first), and only then spends the refresh token.
+This matters because IDPs commonly *rotate* refresh tokens on use — two
+processes spending the same refresh token concurrently can trip reuse
+detection and revoke the whole grant, stranding every process on that
+context. The lock bounds who spends the token; reads stay lock-free, and
+the cache write stays an atomic rename.
+
+A long-lived process and the login verb meet through the same cache, so
+`hits auth login` must run as the same OS user (and `HOME`) the process
+runs under — the practical note for `hits-mcp`, which is typically
+launched by an agent host, not a terminal.
 
 ## What this does not do
 
