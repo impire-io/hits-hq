@@ -1,5 +1,6 @@
 ---
-status: active
+status: graduated
+became: ../../02-DESIGN/idp-auth.md
 ---
 
 # 002 — IDP token exchange in the client
@@ -54,3 +55,15 @@ until restart.
   the security posture says about agents reading it.
 - Shape: a `hits auth login` verb, transparent exchange on first connect,
   or both — and how a NATS context selects its IDP config.
+
+## How it concluded
+
+[`01-current-state.md`](01-current-state.md) records what `hits` main
+already does (token pass-through works; acquisition and freshness do not
+exist) and the mechanics that shape the answers — `nats.TokenHandler` on
+every (re)connect, its conflict with static tokens, contexts having no IDP
+fields. [`02-proposal.md`](02-proposal.md) proposes the answers: one
+`internal/connect` seam, device flow as the only grant, explicit login with
+transparent refresh, config in the 005 file, tokens in `$XDG_STATE_HOME`.
+Graduated as decision [0008](../../03-DECISIONS/0008-client-idp-auth.md)
+and design [`idp-auth.md`](../../02-DESIGN/idp-auth.md).
