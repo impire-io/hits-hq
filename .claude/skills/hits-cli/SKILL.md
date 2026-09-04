@@ -12,8 +12,9 @@ Note: this repo's own process records live in `04-ISSUES/` and have their own sk
 ## Setup
 
 - **Global flags go before the command, command flags after the leading `<id>`.**
-- `--context <name>` selects the NATS context the service runs on (e.g. `personal` for Synadia Cloud). `hits ping` verifies the service is reachable before anything else.
-- Every write carries an **actor**: a stable lowercase handle (`daan`, `claude`) from `--actor` or `$HITS_ACTOR`. Set it before writing; commands without one are rejected.
+- `--context <name>` selects the context the service runs on (e.g. `personal` for Synadia Cloud): hits' own context first (`~/.config/hits/context/<name>.json` — the nats context schema plus an optional `oauth` block, design [idp-auth](../../../02-DESIGN/idp-auth.md)), else the nats CLI's context of that name. `hits ping` verifies the service is reachable before anything else.
+- An `oauth` context needs one interactive login before anything connects: `hits auth login --context <name>` (device flow — open the URL, enter the code). Refresh is transparent afterward; `hits auth status` shows where things stand. If a command fails with "no token for context", that login is the fix.
+- Every write carries an **actor**: a stable lowercase handle (`daan`, `claude`) from `--actor`, `$HITS_ACTOR`, or `defaults.actor` in `~/.config/hits/config.json` (which also takes `defaults.context`). Set one before writing; commands without one are rejected.
 - `--json` for machine-readable output — prefer it when you are parsing.
 - `hits up` runs the whole service fleet in this process, in the foreground, against whatever the context points at (design [hits-up](../../../02-DESIGN/hits-up.md)).
 
