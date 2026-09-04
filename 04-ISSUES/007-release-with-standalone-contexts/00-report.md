@@ -3,6 +3,8 @@ kind: task
 status: open
 located-in: [hits]
 discovered-while: reviewing the hits-cli skill sync for 0011
+claimed-by: Daan Gerits
+claimed: 2026-09-04
 ---
 
 # 007-release-with-standalone-contexts
