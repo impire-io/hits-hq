@@ -8,7 +8,8 @@ lands:
 # The item model
 
 The unit of work in HITS: what `04-ISSUES/` folders and their frontmatter
-become once the platform holds them. Settled by decision
+become once the platform holds them — and, since the cutover (decision
+[0013](../03-DECISIONS/0013-issue-tracking-cutover.md)), what they became. Settled by decision
 [0001](../03-DECISIONS/0001-item-store-architecture.md); the storage contract
 is [`ops-log.md`](ops-log.md), the surface is [`services.md`](services.md).
 
