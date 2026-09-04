@@ -23,3 +23,9 @@ bug/symptom ─────────► 04-ISSUES ──► diagnosis ──�
 ```
 
 The playbooks in [`00-META/process/`](00-META/process/) are the contract: engineers and agents follow the same ones, and agents must not act outside them.
+
+Two derived views leave this repo: the code lands in [`hits`](https://github.com/impire-io/hits), and the skills that teach agents to operate the platform are published through [`impire-marketplace`](https://github.com/impire-io/impire-marketplace) under playbook [06](00-META/process/06-builder-skill-sync.md)'s derivation contract (decision [0007](03-DECISIONS/0007-impire-marketplace.md)). The full repo map is [`00-META/repos.md`](00-META/repos.md).
+
+## License
+
+[Sustainable Use License](LICENSE) — free for internal business, non-commercial, and personal use.
