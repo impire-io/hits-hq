@@ -2,6 +2,8 @@
 kind: task
 status: open
 located-in: [hits]
+claimed-by: Daan Gerits
+claimed: 2026-09-04
 ---
 
 # 010-release-v0-4-0
