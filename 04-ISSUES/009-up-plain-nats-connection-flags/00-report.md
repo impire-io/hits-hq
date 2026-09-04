@@ -2,6 +2,8 @@
 kind: task
 status: open
 located-in: [hits]
+claimed-by: Daan Gerits
+claimed: 2026-09-04
 ---
 
 # 009-up-plain-nats-connection-flags
