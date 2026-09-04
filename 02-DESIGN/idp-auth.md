@@ -27,8 +27,10 @@ mean something is up to them.
 ## hits contexts
 
 A hits context is a hits-owned document — one file per context in
-`$XDG_CONFIG_HOME/hits/context/<name>.json` — and the **only** place
-hits reads connection configuration from. hits fields sit at the top
+`$XDG_CONFIG_HOME/hits/context/<name>.json` — and the only place hits
+reads **stored** connection configuration from (`hits up` can also take
+the same settings ephemerally, as plain flags and `NATS_*` variables —
+[`hits-up.md`](hits-up.md) § plain connection settings). hits fields sit at the top
 level (today: the optional `oauth` block); the NATS connection nests
 under a `nats` key in the **exact orbit natscontext `Settings` schema**
 — url, creds, token, user/password, nkey, cert/key/ca, `tls_first`, all
@@ -85,6 +87,12 @@ connection it:
    ([0011](../03-DECISIONS/0011-standalone-hits-contexts.md)).
 3. A context with an `oauth` block gets `nats.TokenHandler` layered
    through the variadic options, backed by the token cache.
+
+A caller may instead hand the seam plain connection settings
+([`hits-up.md`](hits-up.md) § plain connection settings): they become the
+`nats` subtree of an ephemeral context — never written to the context
+directory — and take the same loader path from step 2, so flags, files,
+and environment variables cannot drift apart in meaning.
 
 The package is the first brick of the shared bootstrap library
 [`repos.md`](../00-META/repos.md) foresees. It lives in `hits` under the

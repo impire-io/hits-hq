@@ -1,18 +1,18 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-03
+updated: 2026-09-04
 ---
 
 # `hits up` — the fleet as one process
 
 The getting-started shape: the whole service fleet running as one process
-inside the one `hits` binary, against whatever NATS system a context points
-at — Synadia Cloud or a self-hosted server. Settled by decision
-[0004](../03-DECISIONS/0004-hits-up.md); the services it composes are
-[`services.md`](services.md), unchanged. Download `hits`, run
-`hits up --context <name>`, and the same binary is the client you then work
-with.
+inside the one `hits` binary, against whatever NATS system a context — or
+a plain `--server` line — points at: Synadia Cloud or a self-hosted
+server. Settled by decision [0004](../03-DECISIONS/0004-hits-up.md); the
+services it composes are [`services.md`](services.md), unchanged. Download
+`hits`, run `hits up --context <name>` (or `hits up --server <url>`), and
+the same binary is the client you then work with.
 
 ```mermaid
 flowchart LR
@@ -44,7 +44,8 @@ denials stay untouched. `up`'s flags follow the subcommand, under its own
 flagset:
 
 ```
-hits up [--context <name>] [--max-bytes <size>]
+hits up [--context <name> | --server <urls> [connection flags]]
+        [--max-bytes <size>]
         [--embedding-url <url> --embedding-model <m>]
 ```
 
@@ -66,6 +67,41 @@ client operating it: two concurrent, bootable on accounts with the
 smallest connection allowances (issue 004 was Synadia Cloud refusing the
 third of four). The standalone fleet binaries are separate processes and
 keep their own connections and names.
+
+### Plain connection settings
+
+A context is saved configuration; CI jobs and containers usually have the
+configuration in hand and nowhere worth saving it. `up` therefore also
+takes the connection directly — flags named as the nats CLI names them,
+each falling back to the nats CLI's environment variable, so an
+environment already set up for `nats` drives `hits up` unchanged (issue
+[009](../04-ISSUES/009-up-plain-nats-connection-flags/00-report.md)):
+
+| flag | environment |
+|---|---|
+| `--server <urls>` (comma-separated) | `NATS_URL` |
+| `--creds <file>` | `NATS_CREDS` |
+| `--user` / `--password` | `NATS_USER` / `NATS_PASSWORD` |
+| `--nkey <file>` | `NATS_NKEY` |
+| `--tlscert` / `--tlskey` | `NATS_CERT` / `NATS_KEY` |
+| `--tlsca <file>` | `NATS_CA` |
+
+The settings assemble the same `nats` block a hits context carries
+([`idp-auth.md`](idp-auth.md) § hits contexts) and connect through the
+same seam — an ephemeral context, never written to disk, so the
+connection semantics are the context schema's by construction. The two
+half-pair mistakes natscontext ignores silently — a password without a
+user, one half of a TLS cert/key pair — are hard errors here.
+
+Precedence is flag → environment → configuration, applied per setting:
+
+- `--context` alongside any connection flag is an error — a context
+  carries its own connection.
+- A flagged `--context` outranks `NATS_URL` in the environment.
+- With neither flagged, `NATS_URL` outranks the configured default
+  context. The auth variables activate only when a server URL is in
+  play — an exported `NATS_CREDS` never bleeds into a context
+  connection.
 
 ## The semantic index is optional here
 
