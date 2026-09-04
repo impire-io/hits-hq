@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: implemented
 code: hits
 updated: 2026-09-04
 lands:
