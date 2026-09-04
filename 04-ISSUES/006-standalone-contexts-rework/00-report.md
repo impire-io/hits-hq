@@ -3,6 +3,8 @@ kind: task
 status: open
 located-in: [hits]
 discovered-while: reviewing 0010 after the idp-auth close-out
+claimed-by: Daan Gerits
+claimed: 2026-09-04
 ---
 
 # 006-standalone-contexts-rework
