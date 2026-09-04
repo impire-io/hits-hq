@@ -16,7 +16,7 @@ Note: this repo's own process records live in `04-ISSUES/` and have their own sk
 - An `oauth` context needs one interactive login before anything connects: `hits auth login --context <name>` (device flow — open the URL, enter the code). Refresh is transparent afterward; `hits auth status` shows where things stand. If a command fails with "no token for context", that login is the fix.
 - Every write carries an **actor**: a stable lowercase handle (`daan`, `claude`) from `--actor`, `$HITS_ACTOR`, or `defaults.actor` in `~/.config/hits/config.json` (which also takes `defaults.context`). Set one before writing; commands without one are rejected.
 - `--json` for machine-readable output — prefer it when you are parsing.
-- `hits up` runs the whole service fleet in this process, in the foreground, against whatever the context points at (design [hits-up](../../../02-DESIGN/hits-up.md)).
+- `hits up` runs the whole service fleet in this process, in the foreground, against whatever the context points at — or, without a context, plain connection flags (`--server`, `--creds`, `--user`/`--password`, ...) and their nats CLI `NATS_*` env vars (design [hits-up](../../../02-DESIGN/hits-up.md)).
 
 ## The model in one breath
 

@@ -16,7 +16,7 @@ The first release, `v0.0.1` (2026-09-02), predates decision 0004 and shipped `hi
 
 ## What running it takes
 
-Nothing is pre-provisioned. The operator points at a JetStream-enabled NATS system through a NATS context — Synadia Cloud or their own server — and `hits-node` creates the ops-log stream and the projection buckets on boot. One HITS per account or JetStream domain ([`../02-DESIGN/hits-up.md`](../02-DESIGN/hits-up.md)). Getting started is `hits up --context <name>`; composed production runs the standalone fleet binaries the same way.
+Nothing is pre-provisioned. The operator points at a JetStream-enabled NATS system through a NATS context — Synadia Cloud or their own server — and `hits-node` creates the ops-log stream and the projection buckets on boot. One HITS per account or JetStream domain ([`../02-DESIGN/hits-up.md`](../02-DESIGN/hits-up.md)). Getting started is `hits up --context <name>` — or `hits up --server <url> --creds <file>` where saving a context first is friction; composed production runs the standalone fleet binaries the same way.
 
 ## If a live environment ever exists
 
