@@ -98,7 +98,7 @@ research 001 found: `cmd/**` was constrained by nothing. After it:
   `internal/cli` + `internal/fleet`, each service main to its service,
   `cmd/hits-mcp` to `internal/mcp`.
 
-The ops-log names (`hits-ops`, `hits-items`, the `hits.ops.>` subjects) —
+The ops-log names (`hits-ops`, `hits-state`, the `hits.ops.>` subjects) —
 previously declared once per service tree — live in `contract`, declared
 once. One HITS per account or JetStream domain; the names carry no prefix
 and there is no knob (decision 0004).

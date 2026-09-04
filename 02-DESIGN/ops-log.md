@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: designed
 code: hits
-updated: 2026-09-03
+updated: 2026-09-04
 lands:
 ---
 
@@ -10,7 +10,8 @@ lands:
 The single canonical record of the HITS platform: every change to every item
 is an op appended here, and everything a caller reads is a projection of it
 (posture: [`how-we-build.md`](../00-META/how-we-build.md)). Settled by
-decision [0001](../03-DECISIONS/0001-item-store-architecture.md). What the ops
+decisions [0001](../03-DECISIONS/0001-item-store-architecture.md) and
+[0012](../03-DECISIONS/0012-single-state-bucket.md). What the ops
 describe is [`item-model.md`](item-model.md); who reads and writes them is
 [`services.md`](services.md).
 
@@ -22,10 +23,10 @@ with a declared byte budget and `DiscardNew` (decision
 `--max-bytes` to change it, and at the cap appends are refused loudly —
 the operator raises the budget; history is never trimmed. Items are kept
 forever, so their ops are too — the budget bounds growth, not memory. The
-projection buckets carry budgets of their own (a quarter of the ops
-budget for `hits-items`, 8 MiB for the small buckets); some accounts
-(Synadia Cloud among them) require every stream to declare one, and HITS
-declares them on every account so there is one shape everywhere.
+state bucket carries a budget of its own — a quarter of the ops budget
+(decision [0012](../03-DECISIONS/0012-single-state-bucket.md)); some
+accounts (Synadia Cloud among them) require every stream to declare one,
+and HITS declares them on every account so there is one shape everywhere.
 
 Every op for an entity is published to exactly one subject:
 
@@ -121,10 +122,16 @@ after a missed ack, or a shared consumer across instances, reorders. So:
 
 ## Identifiers
 
-Item IDs come from a counter key in a small KV bucket (`hits-meta`), advanced
-by a CAS-update loop: read, increment, update-at-revision, retry on conflict.
-Same atomicity as `05-TOOLS/allocate-issue.sh`'s commit-and-retry trick,
-without the git. IDs are dense, ordered, and never reused.
+Item IDs come from the `system.item-counter` key in the state bucket,
+advanced by a CAS-update loop: read, increment, update-at-revision, retry on
+conflict. Same atomicity as `05-TOOLS/allocate-issue.sh`'s commit-and-retry
+trick, without the git. IDs are dense, ordered, and never reused.
+
+The counter is also derived: replay raises it to at least the highest item ID
+the log names, so it carries the same delete-and-replay guarantee as the
+snapshots (§ the state projection). The one edge this accepts: an ID minted
+for an op that never landed is reissued after a rebuild — harmless, since the
+log never named it and nothing can refer to it.
 
 Project slugs are chosen, not minted. Uniqueness needs no counter: the
 `registered` op publishes with expected subject sequence zero, so a second
@@ -133,10 +140,20 @@ writes.
 
 ## The state projection
 
-`hits-node` folds ops into a KV bucket, `hits-items`: key is the item ID,
-value is the current snapshot plus the last-applied sequence. Per-key history
-on the bucket serves "the last few states" natively — no extra machinery.
-Project registrations fold the same way into `hits-projects` — the registry
-`hits-node` validates `located-in` against. Both buckets are projections like
-any other: delete and replay, and they are wrong by definition wherever they
-disagree with the log.
+`hits-node` folds ops into one KV bucket, `hits-state` (decision
+[0012](../03-DECISIONS/0012-single-state-bucket.md)), its keyspace split by
+prefix:
+
+```
+item.<id>        the item snapshot plus the last-applied sequence
+project.<slug>   the registry hits-node validates located-in against
+system.<key>     operational keys — today only system.item-counter
+```
+
+The prefixes are collision-free by construction: item IDs are dense decimals
+and project slugs are lowercase `[a-z0-9-]`, so no key of one kind can spell
+a prefix of another. Per-key history on the bucket serves "the last few
+states" natively — no extra machinery. The whole bucket is a projection like
+any other: delete it and replay reproduces everything in it — snapshots,
+registry, and counter alike — and it is wrong by definition wherever it
+disagrees with the log.

@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: designed
 code: hits
-updated: 2026-09-03
+updated: 2026-09-04
 lands:
 ---
 
@@ -19,7 +19,7 @@ services, never a peer.
 flowchart LR
     C[callers] -->|hits.api.*| N[hits-node]
     N -->|append, CAS| L[(hits-ops stream)]
-    N -->|fold| KV[(hits-items KV)]
+    N -->|fold| KV[(hits-state KV)]
     L -->|ordered consumer| G[hits-index-graph]
     L -->|ordered consumer| S[hits-index-search]
     L -->|ordered consumer| E[hits-index-semantic]
@@ -33,7 +33,8 @@ flowchart LR
 
 The single writer and the state server. It validates every command against
 the item invariants before appending ([`ops-log.md`](ops-log.md) § writes),
-folds the log into the `hits-items` KV projection, and serves state reads
+folds the log into the `hits-state` KV projection
+([`ops-log.md`](ops-log.md) § the state projection), and serves state reads
 from it.
 
 Endpoints, under `hits.api.`:
