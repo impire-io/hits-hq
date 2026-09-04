@@ -5,8 +5,8 @@ located-in: [hits]
 claimed-by: Daan Gerits
 claimed: 2026-09-04
 lands:
-  - { repo: hits-hq, pr: "", after: [] }
-  - { repo: hits, pr: "", after: [hits-hq] }
+  - { repo: hits-hq, pr: "#4", after: [] }
+  - { repo: hits, pr: "#17", after: [hits-hq] }
   - { repo: hits-hq, pr: "", after: [hits], closes: true }
 ---
 
