@@ -74,3 +74,32 @@ between agents.
 - The marketplace repo carries no license yet; one must be chosen before
   the repo is made public.
 - [`00-META/repos.md`](../00-META/repos.md) gains the repo's row.
+
+## Amendment — 2026-09-05: the MCP server is the packaging exception
+
+The "solved in the skill body, not packaging" bullet assumed every
+consumer is an agent reading prose before touching a binary. The plugin
+now also ships an MCP server (`hits-mcp`), and there the assumption
+fails: the harness launches the server at session start, before any
+skill body loads — no agent is in the loop to execute install
+instructions.
+
+So for the MCP server, and only for it, packaging does solve the
+missing binary. The plugin's `.mcp.json` launches `scripts/hits-mcp.sh`,
+a wrapper that resolves the binary in order: `$HITS_MCP_BIN` (developer
+override), `hits-mcp` on PATH (a user-managed install), a cached copy
+re-verified against its recorded sha256, and finally a checksum-verified
+download of the pinned hits release from GitHub. A failed download or
+verification never leaves a cached binary behind, and every failure
+exits with the same manual install options the skill body teaches.
+User-managed installs still win — the download is the out-of-the-box
+fallback, not a replacement for brew or `go install`.
+
+**The pin-bump rule:** the wrapper pins `HITS_VERSION`, the hits release
+this plugin version is paired with; it is bumped alongside the plugin
+version in `.claude-plugin/plugin.json` (and the matching entry in
+`marketplace.json`), so a plugin release always names the server release
+it ships. Landed in impire-marketplace `9e5eeb3` (plugin v0.4.0).
+
+The skill-body pattern stands unchanged for everything an agent runs
+itself: the `hits` CLI, and `hits-mcp` when installed by hand.
