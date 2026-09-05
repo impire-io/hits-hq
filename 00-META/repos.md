@@ -1,6 +1,6 @@
 # The HITS repositories
 
-The map of every repository in the HITS project: what each owns and how it relates to this one. Humans use it for orientation; agents use it for issue triage (playbook [`process/03-issues.md`](process/03-issues.md)). The `code:` frontmatter field in design docs points at entries here.
+The map of every repository in the HITS project: what each owns and how it relates to this one. Humans use it for orientation; agents use it for issue triage (playbook [`process/03-issues.md`](process/03-issues.md)). The `code:` frontmatter field in design docs points at entries here, and this file is the hand-mirrored source of the tracker's project registry (decision [0013](../03-DECISIONS/0013-issue-tracking-cutover.md)): one registered slug per row below.
 
 | Repository | Owns |
 |---|---|

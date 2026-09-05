@@ -7,7 +7,7 @@ description: Operate the HITS tracker with the `hits` CLI — file items, move t
 
 The `hits` binary is the terminal view of the full client surface. This skill teaches the semantics — the lifecycle and the flows; for exact flags, `hits <command> -h` is authoritative (semantics are stable, signatures drift — playbook [06](../../../00-META/process/06-builder-skill-sync.md)).
 
-Note: this repo's own process records live in `04-ISSUES/` and have their own skills (`hits-defer`, `hits-status`). This skill is for the product tracker itself.
+Note: this tracker is also where hits-hq's own work items live — the platform tracks its own issues (decision [0013](../../../03-DECISIONS/0013-issue-tracking-cutover.md)). Playbook [03](../../../00-META/process/03-issues.md) binds the HQ process to these verbs; the repo skills `hits-defer` and `hits-status` delegate here. The pre-cutover records are archived in `04-ISSUES/`, frozen.
 
 ## Setup
 

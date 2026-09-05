@@ -132,7 +132,8 @@ where it is made and visible from the moment it is started.
   out of draft; **merging stays with a human.**
 
 - **Cross-repo landing order is declared, not inferred.** A change spanning
-  repos carries an ordered `lands:` block on its hits-hq work item. hits-hq
-  states the plan; GitHub holds the live state.
+  repos carries an ordered `lands` block on its tracker item (`hits edit
+  --lands`), or in the design doc's frontmatter where the root is a design.
+  The record states the plan; GitHub holds the live state.
 
 The executable steps are [playbook 07](process/07-parallel-work.md).

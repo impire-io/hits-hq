@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
-# The on-demand "what's open" view (playbook 03): open issues with claims and
-# blockers, active research, designs in flight — read from frontmatter, never
-# from a hand-maintained status file.
+# The on-demand view of what stays file-based: active research and designs in
+# flight — read from frontmatter, never from a hand-maintained status file.
+# Work items live in the tracker since decision 0013: `hits search --status
+# open` (the hits-status skill merges both views).
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
@@ -19,35 +20,6 @@ fm() { # fm <file> <key> — first value of a frontmatter key, quotes stripped
     }
   ' "$1"
 }
-
-echo "== Issues (04-ISSUES) =="
-open=0 resolved=0
-found=""
-for report in 04-ISSUES/[0-9]*/00-report.md; do
-  [ -e "$report" ] || continue
-  issue=$(basename "$(dirname "$report")")
-  status=$(fm "$report" status); status=${status:-open}
-  case "$status" in
-    resolved|wontfix) resolved=$((resolved + 1)); continue ;;
-  esac
-  open=$((open + 1))
-  kind=$(fm "$report" kind);         kind=${kind:-bug}
-  priority=$(fm "$report" priority); priority=${priority:-normal}
-  claimed=$(fm "$report" claimed-by)
-  blocked=$(fm "$report" blocked-by)
-  line=$(printf '%-66s %-5s %-11s %-7s %s' \
-    "$issue" "$kind" "$status" "$priority" "${claimed:--}")
-  [ -n "$blocked" ] && line="$line  [blocked by: $blocked]"
-  found+="$line"$'\n'
-done
-if [ "$open" -gt 0 ]; then
-  printf '%-66s %-5s %-11s %-7s %s\n' "issue" "kind" "status" "prio" "claimed-by"
-  printf '%s' "$found"
-else
-  echo "(no open issues)"
-fi
-echo "open: $open   resolved/wontfix: $resolved"
-echo
 
 echo "== Research (01-RESEARCH) =="
 active=0

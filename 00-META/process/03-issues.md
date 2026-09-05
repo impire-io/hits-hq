@@ -1,62 +1,69 @@
 # Playbook 03 — issues
 
-**Trigger:** something needs doing in the platform — a **defect** (`kind: bug`, often without knowing which repo owns it), or a **known follow-up** (`kind: task`) noticed while doing something else and deferred so it isn't lost.
+**Trigger:** something needs doing in the platform — a **defect** (`bug`, often without knowing which repo owns it), a **known follow-up** (`task`) noticed while doing something else and deferred so it isn't lost, or a **deliberate betterment** (`improvement`).
 **Who:** anyone reports; agent and engineer diagnose together.
 
-## Why the front door is here
+Items live in the running HITS install — the platform tracks its own issues (decision [0013](../../03-DECISIONS/0013-issue-tracking-cutover.md)). This playbook states the process rules the tracker does not enforce and names the CLI verb for each step; `hits <command> -h` is authoritative for flags, and the `hits` plugin's commands (`hits:file`, `hits:work`, `hits:resolve`, …) script the same flows over the MCP server. The pre-cutover records are archived long-form in [`04-ISSUES/`](../../04-ISSUES/), frozen, with the folder→item map in its README.
 
-The reporter usually cannot localize a symptom — the client API and the projector are often both suspects. hits-hq is the one place that sees the whole platform (the repo map, every design, every decision), so diagnosis starts here. The fix still lands in the owning code repo.
+## Why the front door is the tracker, and diagnosis still starts here
+
+The reporter usually cannot localize a symptom — the client API and the projector are often both suspects. The record lives in the tracker; the map lives in this repo: [`repos.md`](../repos.md) is the hand-mirrored source of the tracker's project registry, the design docs' `code:` fields say who owns what, and diagnosis conclusions that change designs still land here. The fix still lands in the owning code repo.
+
+If the install is unreachable, capture the symptom in the session trail and file on recovery — the tracker cannot file its own outage.
 
 ## Steps
 
-1. **Report.** First **check for a duplicate**: `grep` across `04-ISSUES/` — *including resolved issues* — for the symptom. The kept-forever corpus is the platform's symptom→component memory; if this symptom was seen before, link that prior issue in the new report (and if it is truly the same open problem, add to it rather than opening a second). Then mint the record with [`05-TOOLS/allocate-issue.sh`](../../05-TOOLS/allocate-issue.sh) `--symptom "<the symptom in plain terms and how it was observed>"` — it commits a minimal real report straight to `origin/main`, taking the next number atomically (a rejected push retries against the new main, so two parallel filings cannot collide). The printed ID is the work ID. Expand the report body by PR from the workspace. No localization required. Frontmatter:
+1. **Report.** First **check for a duplicate**: `hits search "<symptom terms>"` — the corpus is one query wide, resolved items and the imported pre-cutover records included; it is the platform's symptom→component memory. (`hits semantic` adds the check by meaning once the embedding provider is configured — item 14 tracks the gap.) A near-match is a link, not a second filing: if it is truly the same open problem, add a note to the existing item; if it is related but distinct, file and `hits link <new> --type relates-to <prior>`.
 
-   ```yaml
-   ---
-   kind: bug          # bug (default) | task — a task is a known follow-up, not a defect
-   status: open
-   priority: normal   # high | normal | low — optional, defaults to normal; triage signal only
-   claimed-by:        # optional — set via 05-TOOLS/claim.sh, never by hand; intent, not started work
-   claimed:           # YYYY-MM-DD, written by claim.sh alongside claimed-by
-   blocked-by:        # only with status: blocked — what is being waited on: an issue/PR ref or plain prose
-   ---
+   Then file:
+
+   ```
+   hits create --type bug "<the symptom in plain terms and how it was observed>"
    ```
 
-   A **`kind: task`** is a deferred follow-up (sync docs, rename, hand a design off). It already knows its repo, so it opens with `located-in:` set and skips straight to step 4 — no diagnosis. Optionally carry `discovered-while:` so the context you noticed it in isn't lost. The one-line way to file one mid-flow, without stopping to number folders, is the [`hits-defer`](../../.claude/skills/hits-defer/SKILL.md) skill.
+   The report is the **symptom, not a diagnosis** — it is set at creation and never edited, so what was actually observed is exactly what the record keeps. `--discovered-while` is cheap context the next reader otherwise rediscovers; `--priority` only when it genuinely differs from normal. The printed integer ID names the item forever, and it is the **work ID** ([playbook 07](07-parallel-work.md)) if anyone picks the work up.
 
-   **Curate; do not dump.** File only what is worth surfacing when someone next works in that repo. Filing every minor buries the few that matter. "Deferred, not filed" is a valid, deliberate outcome — leave triaged-out polish in the trail (the review, the diagnosis, git), not in a record. A large dropped batch may warrant **one** rollup task pointing at the trail, never one record per item.
+   A **task** is a deferred follow-up (sync docs, rename, hand a design off). It already knows its repo, so it files with `--project <slug>` — the tracker enforces this — and skips straight to step 4: no diagnosis. An **improvement** takes either path, by whether its owner is known at filing. The one-line way to file a task mid-flow is the [`hits-defer`](../../.claude/skills/hits-defer/SKILL.md) skill.
 
-2. **Diagnose** (bugs only — a `kind: task` already knows its repo and skips to step 4). Using [`../repos.md`](../repos.md) and the design docs' `code:` fields to see the platform's shape, reproduce and localize. Record the trail — hypotheses, evidence, dead ends — in `01-diagnosis.md`. Set `status: diagnosing` while working; `status: located` with `located-in: [repo, ...]` once the owner is known.
-3. **Resolve.** Before opening the workspace, **claim the issue**: `05-TOOLS/claim.sh <NNN>`. A claim is intent — "this is mine, don't start it" — recorded in the report's frontmatter on main; the draft PR ([playbook 07](07-parallel-work.md)) remains the signal that work has *started*. `claim.sh <NNN> --release` hands it back; `--steal` takes over an abandoned claim, attributed in the commit message. Open the workspace via [playbook 07](07-parallel-work.md) — the issue number is the work ID — and push to a draft PR from the first commit. When the fix spans repos, declare the landing order in this report's `lands:` block rather than as prose.
-   - Implementation bug → hand the fix to the owning repo's spec-kit bugfix flow; record `fixed-by:` (PR/spec links).
-   - Design gap or ambiguity → amend the design **first** ([playbook 02](02-graduation.md)), record `amended-design:`; the code fix follows the amended design via [playbook 04](04-build-handoff.md).
+   **Curate; do not dump.** File only what is worth surfacing when someone next works in that repo. Filing every minor buries the few that matter. "Deferred, not filed" is a valid, deliberate outcome — leave triaged-out polish in the trail (the review, the diagnosis, git), not in an item. A large dropped batch may warrant **one** rollup task pointing at the trail, never one item per entry.
 
-   **Blocked is a status, not a comment.** At any point — reported, diagnosing, or located — an issue that cannot move gets `status: blocked`, with the reason in `blocked-by:`: an issue number, a PR, an external party, a pending decision — whatever names the thing being waited on. Blocked is active, not terminal: the record stays on the triage board with its reason beside it, and a claim on it stays meaningful. When the blocker lifts, restore the status the issue was in and clear `blocked-by:`. A blocked issue with no `blocked-by:` is legal but weak — the next reader has to rediscover the blocker, so name it when you know it.
-4. **Close.** Set `status: resolved` with `resolved: <YYYY-MM-DD>`, or `wontfix` with the reasoning in the report.
+2. **Diagnose** (bugs only — a task already knows its repo and skips to step 4). Using [`../repos.md`](../repos.md) and the design docs' `code:` fields to see the platform's shape, reproduce and localize. **The trail is notes**: append hypotheses, evidence, and dead ends with `hits note <id> "<text>"` *as you find them*, not as a write-up afterwards — notes are append-only history, and a dead end recorded is a dead end nobody re-walks. Move the status as reality changes: `hits transition <id> --to diagnosing` while working, `--to located --project <slug>` once the owner is known (registered slugs only).
+
+3. **Resolve.** Before opening the workspace, **claim the item**: `hits claim <id>`. A claim is intent — "this is mine, don't start it"; the draft PR ([playbook 07](07-parallel-work.md)) remains the signal that work has *started*. `hits release <id>` hands it back — note first what was tried and ruled out, so the release is a handoff rather than an abandonment. `hits claim <id> --steal` takes over a truly abandoned claim; the record keeps who it was taken from. Open the workspace via playbook 07 — the item ID is the work ID — and push to a draft PR from the first commit. When the fix spans repos, declare the landing order in the item's `lands` block (`hits edit <id> --lands '<json>'`, playbook 07 owns the shape) rather than as prose or a note.
+   - Implementation bug → hand the fix to the owning repo's spec-kit bugfix flow; the refs ride the close (step 4).
+   - Design gap or ambiguity → amend the design **first** ([playbook 02](02-graduation.md)) and record it with `--amended-design` on the close; the code fix follows the amended design via [playbook 04](04-build-handoff.md).
+
+   **Blocked is a status the record keeps for you.** At any point — reported, diagnosing, or located — an item that cannot move gets `hits block <id> --by "<what>"`: an item ref, a PR, an external party, a pending decision — whatever names the thing being waited on. Blocked is active, not terminal: the item stays on the board with its reason beside it, and a claim on it stays meaningful. The record remembers the status it interrupted, and `hits unblock <id>` restores exactly that status — no human memory required, never a manual transition. A block without `--by` is legal but weak — name the blocker when you know it, and if the blocker is itself a tracked item, link it `relates-to` too.
+
+4. **Close.** Append the closing reasoning as a note, then `hits resolve <id>` carrying the refs — or `hits wontfix <id>` with the reasoning noted first: too costly, obsolete, working as intended, superseded (link the successor). Closing stamps the date, and **terminal is terminal by machine rule** — the tracker refuses every further transition. A defect found afterwards is a **new item** against the repo that owns it, never a reopening: the corpus is symptom→component memory, and reopening would corrupt the record of when a thing was delivered.
 
    ### The definition of done: delivered, not verified-by-someone-eventually
 
-   An issue is done when its work is **built**, **released** where the repo cuts releases, **deployed** where the change only takes effect once deployed, and **validated on the install**. All four, and nothing beyond them.
+   An item is done when its work is **built**, **released** where the repo cuts releases, **deployed** where the change only takes effect once deployed, and **validated on the install**. All four, and nothing beyond them.
 
    **Validated means one live read of the running system that could not succeed if the thing were broken.** Not a merge — the parent project repeatedly saw a merged fix change nothing on the running install. Not a command that exited zero. Prefer a read whose *failure modes differ*, so a pass is evidence rather than coincidence: when each missing piece — a missing export, a missing import, an unset scope — fails differently (no-responders, permissions violation, timeout), a read that produces the one correct answer rules them all out at once.
 
-   Record that read as a `fixed-by:` entry with **`action: deploy`** and the evidence in the note, beside the `pr:`/`commit:` entries for the code. `05-TOOLS/check-claims.sh` counts these as operational and does not try to resolve them to a commit — the note is the proof, so write what you actually observed, not what you ran.
+   Record that read as a `fixed-by` entry with **`action:deploy`** and the evidence in the note, beside the `pr:`/`commit:` entries for the code. The note is the proof — write what you actually observed, not what you ran.
 
    **What does not hold a record open:**
 
-   - **A manual exercise nobody has scheduled.** "Someone should try it end to end once" is a wish, not a blocker. If the exercise genuinely matters, it is its own record with its own owner — filed against the delivered issue, rather than the delivered issue being held open for it.
-   - **Work owned by another repo or another issue.** Name the dependency and close; do not inherit someone else's worklist.
-   - **The possibility of a defect.** A defect found afterwards is a **new issue** against the repo that owns it, never a reopening. The corpus is symptom→component memory; reopening corrupts the record of when a thing was delivered.
+   - **A manual exercise nobody has scheduled.** "Someone should try it end to end once" is a wish, not a blocker. If the exercise genuinely matters, it is its own item with its own owner — filed against the delivered one, rather than the delivered one being held open for it.
+   - **Work owned by another repo or another item.** Name the dependency and close; do not inherit someone else's worklist.
+   - **The possibility of a defect.** A defect found afterwards is a **new item**, never a reopening — and here the tracker enforces the rule this playbook used to carry alone.
 
-   The reason this bar exists rather than a stricter one: an issue held open for something nobody is scheduled to do stops being a worklist item and becomes indistinguishable from undelivered work. A triage board where half the open records are actually finished is a board no one can act on — the same rot as `05-TOOLS/check-unclaimed.sh` catches, arrived at from the opposite direction.
+   The reason this bar exists rather than a stricter one: an item held open for something nobody is scheduled to do stops being a worklist entry and becomes indistinguishable from undelivered work. A board where half the open items are actually finished is a board no one can act on.
 
    ### Recording the refs
 
-   Where the work spanned repos, closing is the `closes: true` entry declared in this report's own `lands:` block ([playbook 07](07-parallel-work.md) step 3): a hits-hq PR landing **after** every code PR, so each `fixed-by:` reference is already an ancestor of its repo's main and `05-TOOLS/check-claims.sh` can verify it. Closing has a declared place in the landing order rather than being remembered afterwards — the omission is the single most common way an HQ repo goes stale, and `05-TOOLS/check-unclaimed.sh` fails CI when a repo's main names an issue hits-hq still shows as open.
+   Refs ride the closing op only — `hits resolve <id> --fixed-by "<form>" [--amended-design <doc>]` — in three forms: `pr:`, `commit:`, `action:`.
 
-   Two ref forms bite at exactly this moment, because flipping to `resolved` is what makes `05-TOOLS/check-claims.sh` read the *whole* record rather than only the parts already claimed as done — so refs that sat unverified for months all fail at once, on the closing branch:
+   - **Qualify PR refs with the repo:** `pr:impire-io/hits#9`. The ref form carries no repo field of its own, and once more than one project is in play a bare `#9` answers nothing.
+   - **`pr:` only where merges reference the PR.** A PR ref is verifiable by finding a commit on main whose message references the pull request — GitHub's merge commits (`Merge pull request #N …`) and squash merges (`… (#N)`) both qualify. A repo that fast-forwards or rebase-merges without that reference produces no such commit, so `pr:` there is unverifiable no matter how real the PR was — `commit: <sha>` is the only honest form.
+   - **Releases are `action:release <product> <version>`** with the evidence in the note — there is no tag ref form, so the tag is named in prose.
+   - **Deploy validation is `action:deploy`** with what you actually observed, as above.
 
-   - **`pr:` only where merges reference the PR.** A `pr: "#N"` ref is verified by finding a commit on main whose message references the pull request — GitHub's merge commits (`Merge pull request #N …`) and squash merges (`… (#N)`) both qualify. A repo that fast-forwards or rebase-merges without that reference produces no such commit, so `pr:` there is unverifiable no matter how real the PR was — `commit: <sha>` is the only honest form. A `lands:` block that *says so in a comment* while still using `pr:` is not protection.
-   - **A closing entry cannot cite its own PR.** The ref must be an ancestor of `origin/main` and a commit cannot cite itself, so filling the closing entry's `pr:` in makes CI fail on the very branch carrying the closure. Leave it `pr: ""` — git history recovers it.
+   Nothing verifies these refs today: the planned frontmatter checkers died with the file-based process (decision 0013), and their replacement — a tracker-side auditor against the client API — does not exist yet (item 17). Until it does, the honesty is yours.
 
-   Closed issues are kept forever, **in place** — they are the platform's symptom→component memory and the corpus the duplicate-check in step 1 searches. Deleting them (leaving only git history) or moving them to an archive folder both defeat that: the first makes the memory unreachable by a working-tree `grep`, the second splits the searchable corpus in two. There is no archive directory by design; the "what's open" view is generated on demand by [`hits-status`](../../.claude/skills/hits-status/SKILL.md), so resolved records never clutter it.
+   **Closing is a tracker op, not a landing entry.** Where the work spanned repos, the close happens after the last PR in the item's `lands` block merges and the validation read is done — [playbook 07](07-parallel-work.md) owns the ordering and the closing rule.
+
+   Closed items are kept forever in the tracker, searchable beside open ones — one query covers the whole memory, and the "what's open" view ([`hits-status`](../../.claude/skills/hits-status/SKILL.md)) never shows them. The pre-cutover corpus is additionally archived long-form in [`04-ISSUES/`](../../04-ISSUES/), frozen in place.

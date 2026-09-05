@@ -124,8 +124,9 @@ after a missed ack, or a shared consumer across instances, reorders. So:
 
 Item IDs come from the `system.item-counter` key in the state bucket,
 advanced by a CAS-update loop: read, increment, update-at-revision, retry on
-conflict. Same atomicity as `05-TOOLS/allocate-issue.sh`'s commit-and-retry
-trick, without the git. IDs are dense, ordered, and never reused.
+conflict. Same atomicity as the retired `allocate-issue.sh`'s commit-and-retry
+trick (the file-based filing rail this platform replaced, decision
+[0013](../03-DECISIONS/0013-issue-tracking-cutover.md)), without the git. IDs are dense, ordered, and never reused.
 
 The counter is also derived: replay raises it to at least the highest item ID
 the log names, so it carries the same delete-and-replay guarantee as the
