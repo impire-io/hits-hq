@@ -16,7 +16,7 @@ There are **no central status files** in this repo by design: work items carry t
    hits --json search --status blocked --limit 100
    ```
 
-   Search returns IDs and scores only — `hits --json get <id>` each hit for its type, claim, blockers, and latest notes. To scope to one project, use the graph instead: `hits graph neighbors <slug> --kind project`. Repeat with `--status diagnosing` and `--status located` when the full board matters.
+   Search renders a table of item fields and its `--json` carries each hit's full snapshot under `item` (hits main since spec 012; a binary still on v0.4.0 prints IDs and scores only — there, `hits --json get <id>` each hit). `--columns` narrows the table; `hits get <id>` fetches a trail when the notes matter. To scope to one project, use the graph instead: `hits graph neighbors <slug> --kind project`. Repeat with `--status diagnosing` and `--status located` when the full board matters.
 
 2. **The file side** — what stays frontmatter-based:
 
