@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-03
+updated: 2026-09-06
 ---
 
 # The MCP server — `hits-mcp`
@@ -60,6 +60,7 @@ change.
 | `note_item` | `hits.api.note` | ✓ |
 | `tombstone_item` | `hits.api.tombstone` | ✓ |
 | `register_project` | `hits.api.project.register` | ✓ |
+| `retire_project` | `hits.api.project.retire` | ✓ |
 | `list_projects` | `hits.api.project.list` | |
 | `search_items` | `hits.search.query` | |
 | `semantic_search` | `hits.semantic.query` | |

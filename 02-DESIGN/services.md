@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-04
+updated: 2026-09-06
 lands:
 ---
 
@@ -50,7 +50,7 @@ Endpoints, under `hits.api.`:
 | `link` / `unlink` | typed edges |
 | `note` | append a trail entry |
 | `tombstone` | void a filing mistake |
-| `project.register` / `project.list` | the `located-in` vocabulary — CAS-guarded registration, listing from the registry projection |
+| `project.register` / `project.retire` / `project.list` | the `located-in` vocabulary — CAS-guarded registration, retirement (decision [0015](../03-DECISIONS/0015-project-retirement.md)), listing from the registry projection (retired slugs dropped) |
 
 Machine-legible errors throughout: an invariant rejection names the invariant
 — agents are the first-class operators. Every command names its `actor`, a

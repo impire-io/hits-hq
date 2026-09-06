@@ -1,5 +1,5 @@
 ---
-status: implemented
+status: in-progress
 code: hits
 updated: 2026-09-06
 lands:
@@ -79,12 +79,15 @@ them; the log reads as the item's history.
 | `linked` / `unlinked` | link type, target item |
 | `tombstoned` | reason |
 
-On `hits.ops.project.<slug>`, one op for now — a project is vocabulary, not
-workflow ([`item-model.md`](item-model.md) § projects and actors):
+On `hits.ops.project.<slug>`, two ops — a project is vocabulary, not
+workflow, and this is the vocabulary's whole lifecycle
+([`item-model.md`](item-model.md) § projects and actors, decision
+[0015](../03-DECISIONS/0015-project-retirement.md)):
 
 | Op | Payload carries |
 |---|---|
 | `registered` | display name, description |
+| `retired` | reason — the slug leaves the vocabulary; history stands |
 
 ## Ordering
 
@@ -141,7 +144,10 @@ log never named it and nothing can refer to it.
 Project slugs are chosen, not minted. Uniqueness needs no counter: the
 `registered` op publishes with expected subject sequence zero, so a second
 registration of the same slug is rejected by the same CAS that orders item
-writes.
+writes. The same CAS is what makes retirement permanent — a retired slug's
+subject already carries ops, so re-registering it is rejected without any
+machinery of its own (decision
+[0015](../03-DECISIONS/0015-project-retirement.md)).
 
 ## The state projection
 
