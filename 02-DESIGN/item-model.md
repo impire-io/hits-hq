@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: designed
 code: hits
-updated: 2026-09-03
+updated: 2026-09-06
 lands:
 ---
 
@@ -89,6 +89,9 @@ violate one is rejected, never partially applied.
 - `located-in` names only registered projects — the registry is what makes
   this and the previous invariant real checks rather than shape checks.
 - Every command carries an `actor`, validated for form.
+- Every free-text field fits its byte budget — bodies 8 KiB, labels 1 KiB
+  (decision [0014](../03-DECISIONS/0014-op-text-budgets.md)); over budget
+  is refused, never trimmed.
 - `closed` is set exactly when status becomes terminal; `fixed-by` and
   `amended-design` are carried by the closing transition.
 - A tombstoned item accepts no further ops.
@@ -100,7 +103,10 @@ the creation op. Everything after it is a **note**: an appended trail entry
 with an author and a timestamp. The diagnosis trail of a bug (hypotheses,
 evidence, dead ends — the old `01-diagnosis.md`) is its notes; so is closing
 reasoning on a `wontfix`. Notes are append-only: the trail is history, and
-history is not edited.
+history is not edited. Bodies are budgeted — 8 KiB each (decision
+[0014](../03-DECISIONS/0014-op-text-budgets.md)), enough for prose, not for
+pasted logs; a body over budget is refused whole, and the artifact belongs
+in the repo or the PR with its reference in the note.
 
 ## Links
 

@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: designed
 code: hits
-updated: 2026-09-04
+updated: 2026-09-06
 lands:
 ---
 
@@ -45,7 +45,11 @@ the envelope.
 ## The envelope
 
 The envelope is the platform's wire contract — every service shares it, and
-changing it is a design amendment. Each op carries:
+changing it is a design amendment. Every free-text payload field carries a
+byte budget checked before the op is appended (decision
+[0014](../03-DECISIONS/0014-op-text-budgets.md)): bodies — report and note
+text — 8 KiB, every other label 1 KiB, and over budget is refused loudly
+with an `over-budget` invariant, never trimmed. Each op carries:
 
 ```yaml
 id:       # unique op id — doubles as Nats-Msg-Id for publish dedupe
