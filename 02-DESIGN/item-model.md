@@ -1,5 +1,5 @@
 ---
-status: implemented
+status: in-progress
 code: hits
 updated: 2026-09-06
 lands:
@@ -148,10 +148,22 @@ hits install today, a project is a repo; the model term is deliberately more
 general. Projects are registered vocabulary, not workflow: a thin entity
 with a chosen subject-token-safe slug, a display name, and a description,
 created by a registration op on its own subject ([`ops-log.md`](ops-log.md))
-and referenced by items from then on. No status, no lifecycle, no notes —
+and referenced by items from then on. No status, no notes, no workflow —
 machinery a vocabulary does not need. Registration is what keeps one typo
 from silently splitting the symptom→component memory, and the install's
 registry mirrors [`repos.md`](../00-META/repos.md) by hand.
+
+A project leaves the vocabulary by **retirement** — a `retired` op with a
+required reason, for the mistyped or superseded slug (decision
+[0015](../03-DECISIONS/0015-project-retirement.md)). Registration and
+retirement are the whole lifecycle. Retirement removes the slug from the
+vocabulary, not from history: `project.list` drops it and a new op writing
+`located-in` may no longer name it (`retired-project`), but items that
+already name it keep it — ops are immutable — and still close, since a
+closing transition carries no `located-in`. A retired slug is never
+re-registered and never reused; the registry never says one name meant two
+things. There is no rename: the path is register the successor, re-point
+open items by edit, retire the old slug.
 
 An **actor** is a stable lowercase handle (`daan`, `claude`), not a record:
 carried as `actor` on every op, validated for form, not existence. There is
