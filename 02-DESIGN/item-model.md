@@ -123,7 +123,7 @@ fact each one is:
   can retract it.
 - **References outside the item graph** — `located-in` (projects),
   `discovered-while`, a `blocked-by` naming an external party — stay
-  properties. A project is registered vocabulary with no lifecycle
+  properties. A project is registered vocabulary, not workflow
   ([below](#projects-and-actors)); the reference is a fact about the item,
   consumed by the item's own invariants ("a task opens with `located-in`"),
   not an edge asserted and retracted in its own right.
