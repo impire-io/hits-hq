@@ -1,5 +1,5 @@
 ---
-status: designed
+status: implemented
 code: hits
 updated: 2026-09-06
 lands:
