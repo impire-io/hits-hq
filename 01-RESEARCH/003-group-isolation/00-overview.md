@@ -8,13 +8,17 @@ status: active
 
 The HITS install this project runs on has turned out to be shared: its
 project registry and item corpus carry another group's work beside our
-own. This effort investigates where the boundary between groups of
-projects belongs — in the install topology (one HITS per group, the
-grain decision [0004](../../03-DECISIONS/0004-hits-up.md) already
-names: one HITS per account, no prefix knob), in the data model
-(first-class groups on projects and items), or nowhere but discipline —
-and, whichever way that lands, how an already-mixed corpus untangles
-without violating "nothing is lost."
+own. The effort opened on the question of where the boundary between
+groups of projects belongs — install topology, data model, or
+discipline. That question is now answered by the owner: sharing is
+**wanted** — one HITS system should track multiple groups of projects,
+named **initiatives**. What remains under investigation is the shape:
+the initiative vocabulary, how projects and items group under it, which
+surfaces scope by it, and how the existing registry backfills.
+[`02-proposal.md`](02-proposal.md) carries the proposed shape — an
+initiative as a lens, not a wall, with decision
+[0004](../../03-DECISIONS/0004-hits-up.md)'s account boundary untouched
+as the only hard isolation.
 
 ## Why
 
@@ -56,4 +60,8 @@ Three consequences were on the table within minutes:
   decide unilaterally.
 
 [`01-current-state.md`](01-current-state.md) records the verified
-facts, the incident, and the open questions.
+facts, the incident, and the open questions — including the effort's
+initial position (one install per group), kept as the record of where
+the thinking started. [`02-proposal.md`](02-proposal.md) reverses it on
+question 1's answer and proposes initiatives: the model, the surfaces,
+the non-goals, and the open questions graduation must settle.
