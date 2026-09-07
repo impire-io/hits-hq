@@ -59,10 +59,11 @@ If the install is unreachable, capture the symptom in the session trail and file
 
    - **Qualify PR refs with the repo:** `pr:impire-io/hits#9`. The ref form carries no repo field of its own, and once more than one project is in play a bare `#9` answers nothing.
    - **`pr:` only where merges reference the PR.** A PR ref is verifiable by finding a commit on main whose message references the pull request — GitHub's merge commits (`Merge pull request #N …`) and squash merges (`… (#N)`) both qualify. A repo that fast-forwards or rebase-merges without that reference produces no such commit, so `pr:` there is unverifiable no matter how real the PR was — `commit: <sha>` is the only honest form.
+   - **Commit refs qualify the same way:** `commit:impire-io/hits@<sha>`. A bare sha is read against the item's `located-in` projects, so qualify whenever the item spans repos — the corpus already carries both forms and the auditor verifies both.
    - **Releases are `action:release <product> <version>`** with the evidence in the note — there is no tag ref form, so the tag is named in prose.
    - **Deploy validation is `action:deploy`** with what you actually observed, as above.
 
-   Nothing verifies these refs today: the planned frontmatter checkers died with the file-based process (decision 0013), and their replacement — a tracker-side auditor against the client API — does not exist yet (item 17). Until it does, the honesty is yours.
+   `hits audit --repo <slug>=<path>` (repeatable, one mapping per local clone) verifies these refs against git (item 17): every pr ref needs a commit subject on the named repo's main referencing it, and every commit ref must be an ancestor of main — checked in the qualified repo, or in the item's `located-in` clones when bare. Refs the given mapping cannot check are warned, never silently passed; `action:` refs stay prose-verified by their notes. The same run flags merged work-ID branches whose item is still open, and any contradiction exits non-zero — the CI-guard posture the file-era checkers were planned for.
 
    **Closing is a tracker op, not a landing entry.** Where the work spanned repos, the close happens after the last PR in the item's `lands` block merges and the validation read is done — [playbook 07](07-parallel-work.md) owns the ordering and the closing rule.
 

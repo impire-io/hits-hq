@@ -39,8 +39,9 @@ exist for HITS yet:
 | `check-refs.sh` | playbook 07 | Verify cross-repo references to this repo's paths |
 | guard hooks | playbook 07 | Refuse writes to shared clones and unscoped workspace deletes |
 
-Re-scoped by decision 0013, tracked as a hits item (17) rather than rows
-here: the planned `check-claims.sh` and `check-unclaimed.sh` guards read
-issue frontmatter that no longer changes — their job (verify `fixed-by` refs
-are ancestors of the owning repo's main; flag merged work whose item is still
-open) moves to a tracker-side auditor built against the client API.
+Re-scoped by decision 0013 and delivered as a hits item (17) rather than
+rows here: the planned `check-claims.sh` and `check-unclaimed.sh` guards
+read issue frontmatter that no longer changes, so their job — verify
+`fixed-by` refs are true on the owning repo's main; flag merged work whose
+item is still open — lives in the tracker's own CLI as `hits audit --repo
+<slug>=<path>`, run where the clones are.
