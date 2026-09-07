@@ -8,6 +8,12 @@ efforts side by side. The name for the grouping: **initiative**. This
 reverses the effort's initial position (one install per group), which
 stands in 01-current-state as the record of where the thinking started.
 
+Two further calls from the owner, same day, folded in below: item IDs
+are **initiative-prefixed**, not one global sequence; and the
+lens-not-wall stance is confirmed — multiple initiatives being readable
+is a feature, with harder restrictions arriving later at the account
+edge (e.g. NATS auth-callout) if ever needed, never in the model.
+
 ## What an initiative is
 
 A named group of projects inside one install. Every project belongs to
@@ -18,12 +24,16 @@ it.
 **An initiative is a lens, not a wall.** Decision
 [0004](../../03-DECISIONS/0004-hits-up.md) stands untouched: the NATS
 account (or JetStream domain) remains the only *isolation* boundary,
-and everyone on an account can read everything on it. What initiatives
-change is scope-by-default: tools and views operate within an
-initiative unless told otherwise, so the chronicle incident's failure
-mode — tooling drifting into another group's territory because nothing
-marked the line — gets a marked line. A team that needs a hard wall
-still gets its own account.
+and everyone on an account can read everything on it — confirmed as
+the desired behavior, not a compromise: seeing across initiatives is a
+feature. What initiatives change is scope-by-default: tools and views
+operate within an initiative unless told otherwise, so the chronicle
+incident's failure mode — tooling drifting into another group's
+territory because nothing marked the line — gets a marked line. If
+harder restrictions are ever needed, they arrive at the account edge —
+ad-hoc per-caller permissions via NATS auth-callout is the named
+candidate — never as model machinery. A team that needs a hard wall
+today still gets its own account.
 
 ## Proposed model shape
 
@@ -37,14 +47,29 @@ still gets its own account.
   (provenance in the op, decision 0013's import precedent). The
   registry stays the flat located-in vocabulary — the initiative field
   is how it folds into groups.
-- **Items derive their initiative through `located-in`.** No new field
-  on items where derivation answers it. The two gaps derivation leaves
-  are open questions below: items filed with no project yet, and items
-  whose projects would span initiatives.
-- **Dense global IDs stay.** One sequence per install means item IDs —
-  and therefore work-ID branch names (playbook 07) — remain
-  collision-free *across* initiatives. Sharing the sequence is a
-  feature of the shared install, and worth stating in the design.
+- **Item IDs are initiative-prefixed: `<initiative>-<n>`,** minted from
+  a dense per-initiative sequence (owner's call, replacing this
+  proposal's first draft of one global sequence). `hits-19`,
+  `chronicle-4`. The ID carries the initiative, which makes the
+  initiative **intrinsic to the item from filing**: every create names
+  its initiative (flag or config default), because the mint needs it.
+  That dissolves two questions the derivation model left open — an
+  unlocated bug has an initiative before it has a project, and
+  `located-in` is *validated* against the item's initiative, so
+  spanning items are refused by construction rather than by rule.
+- **Work IDs stay one string.** The prefixed ID is the branch name,
+  workspace directory, and PR label (playbook 07) — `hits-19` is
+  branch-safe, label-safe, and NATS-subject-safe, and cross-initiative
+  collision-freedom now holds by construction instead of by a shared
+  counter. The dense per-initiative sequence keeps the auditor's
+  walk-to-first-gap enumeration, run per initiative off the registry.
+- **Existing bare IDs are grandfathered, never renumbered.** Items 1–28
+  keep their IDs forever: refs in closed records, merged branches named
+  `17`, and the ops-log all cite them, and terminal is terminal.
+  Backfill ops assign each legacy item an initiative without touching
+  its ID; the bare sequence freezes — no new bare mints. The audit's
+  check B keeps resolving historical bare-integer branches against the
+  legacy range while parsing prefixed work IDs going forward.
 
 ## Proposed surface shape
 
@@ -64,9 +89,10 @@ still gets its own account.
 - No per-initiative accounts, streams, buckets, or subject prefixes —
   0004's no-prefix stance is untouched.
 - No access control. A lens, not a wall, stated plainly in every doc
-  this graduates into.
-- No item-level initiative field while derivation through projects
-  suffices.
+  this graduates into; hard restrictions, if ever, live at the account
+  edge (auth-callout), outside this design.
+- No renumbering of history. Legacy bare IDs stand forever; migration
+  is assignment ops, never rewritten identity.
 - No cross-install federation. One install, several initiatives; several
   installs remain several installs.
 
@@ -81,21 +107,31 @@ the rule's truthfulness without touching their records.
 
 ## Open questions for graduation
 
-1. **Unlocated items.** A bug filed before diagnosis has no project,
-   hence no derived initiative. Options: require `--initiative` at
-   creation when no project is given; or a client-config default
-   initiative beside the default actor. Lean: config default, explicit
-   flag to override — filing must stay one command.
-2. **Spanning items.** `located-in` is a list; two projects from two
-   initiatives on one item makes its initiative ambiguous. Lean:
-   refuse at write time (minimal, revisit on a real case).
+Two of the first draft's questions dissolved when the ID became
+initiative-prefixed: an unlocated item has an initiative because its ID
+does, and spanning items are refused because `located-in` validates
+against the item's initiative. What remains:
+
+1. **The filing default.** Every create now needs an initiative for
+   the mint. Lean: a client-config default initiative beside the
+   default actor, `--initiative` to override — filing must stay one
+   command.
+2. **The ID parse rule.** Initiative slugs may contain hyphens
+   (`chronicle-hq-4` must parse), so the item number is the trailing
+   all-digit segment and initiative slugs are refused a trailing
+   all-digit segment at registration. Verify the full charset is
+   branch-, label-, and subject-safe at graduation.
 3. **Scope defaults.** Do search/status/audit default to the config's
    initiative or to the whole corpus? Lean: whole corpus stays the
-   no-flag behavior (backwards-honest), the config default arrives
-   only with the config knob from question 1.
+   no-flag behavior (backwards-honest); the config default arrives
+   only with question 1's knob.
 4. **The graph index** — whether initiative nodes materialize as
-   derived edges (project → initiative) the way project and actor
-   nodes do today.
+   derived edges (project → initiative, item → initiative) the way
+   project and actor nodes do today.
+5. **Legacy assignment.** Which initiative each of items 1–28 backfills
+   into, and whether the frozen bare sequence needs anything beyond
+   "no new mints" (lean: nothing — the audit walks it as a fixed
+   range).
 
 ## Path from here
 

@@ -18,7 +18,9 @@ surfaces scope by it, and how the existing registry backfills.
 [`02-proposal.md`](02-proposal.md) carries the proposed shape — an
 initiative as a lens, not a wall, with decision
 [0004](../../03-DECISIONS/0004-hits-up.md)'s account boundary untouched
-as the only hard isolation.
+as the only hard isolation, and item IDs initiative-prefixed
+(`hits-19`) from dense per-initiative sequences, legacy bare IDs
+grandfathered.
 
 ## Why
 
