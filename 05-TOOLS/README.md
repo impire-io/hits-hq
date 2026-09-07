@@ -44,4 +44,5 @@ rows here: the planned `check-claims.sh` and `check-unclaimed.sh` guards
 read issue frontmatter that no longer changes, so their job — verify
 `fixed-by` refs are true on the owning repo's main; flag merged work whose
 item is still open — lives in the tracker's own CLI as `hits audit --repo
-<slug>=<path>`, run where the clones are.
+<slug>=<path>`, run where the clones are: a periodic net (pre-release,
+board grooming, CI on main), not a step of every close.
