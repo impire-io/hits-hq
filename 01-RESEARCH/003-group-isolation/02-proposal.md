@@ -73,13 +73,22 @@ today still gets its own account.
 
 ## Proposed surface shape
 
-- `hits initiative register|retire|list` on the CLI, matching MCP
-  tools under the 1:1 rule, `client.RegisterInitiative` etc. on the
-  one surface.
+- `hits initiative register|retire|list|select` on the CLI, matching
+  MCP tools under the 1:1 rule, `client.RegisterInitiative` etc. on
+  the one surface. `select` mirrors `hits context select`: the
+  selected initiative lives in the client config beside the default
+  actor, and `create` mints from it unless `--initiative` overrides.
+  **Selection is a filing default, not a read scope** — queries are
+  unaffected by it.
 - The corpus-wide readers grow an initiative scope: `--initiative` on
   search and the status view, and on `hits audit` (whose `--repo`
   mapping already scopes the git side — the flag scopes the tracker
-  walk's findings to match). Defaults are an open question below.
+  walk's findings to match). Without the flag every reader covers the
+  whole corpus, exactly as today — scoping is always explicit, and
+  dedup search keeps its full symptom memory.
+- The graph index materializes initiative nodes with derived edges
+  (project → initiative, item → initiative), the way project and
+  actor nodes derive today — in this build, not deferred.
 - No read authorization changes: scoping is filtering, on the client
   side of the one surface, consistent with headless ("human ergonomics
   are the job of the views built on top").
@@ -105,40 +114,44 @@ governs the `hits` initiative's rows; `chronicle-hq` moves under a
 chronicle initiative governed by its own group — which also restores
 the rule's truthfulness without touching their records.
 
-## Open questions for graduation
+## Settled at owner review, 2026-09-11
 
-Two of the first draft's questions dissolved when the ID became
-initiative-prefixed: an unlocated item has an initiative because its ID
-does, and spanning items are refused because `located-in` validates
-against the item's initiative. What remains:
+Two of the first draft's questions had already dissolved when the ID
+became initiative-prefixed: an unlocated item has an initiative because
+its ID does, and spanning items are refused because `located-in`
+validates against the item's initiative. The remaining five were put to
+the owner and answered:
 
-1. **The filing default.** Every create now needs an initiative for
-   the mint. Lean: a client-config default initiative beside the
-   default actor, `--initiative` to override — filing must stay one
-   command.
-2. **The ID parse rule.** Initiative slugs may contain hyphens
-   (`chronicle-hq-4` must parse), so the item number is the trailing
-   all-digit segment and initiative slugs are refused a trailing
-   all-digit segment at registration. Verify the full charset is
-   branch-, label-, and subject-safe at graduation.
-3. **Scope defaults.** Do search/status/audit default to the config's
-   initiative or to the whole corpus? Lean: whole corpus stays the
-   no-flag behavior (backwards-honest); the config default arrives
-   only with question 1's knob.
-4. **The graph index** — whether initiative nodes materialize as
-   derived edges (project → initiative, item → initiative) the way
-   project and actor nodes do today.
-5. **Legacy assignment.** Which initiative each of items 1–28 backfills
-   into, and whether the frozen bare sequence needs anything beyond
-   "no new mints" (lean: nothing — the audit walks it as a fixed
-   range).
+1. **The filing default: `hits initiative select`.** A currently
+   selected initiative in the client config, mirroring `hits context
+   select`, with `--initiative` overriding per call. Selection feeds
+   the mint only — it never scopes reads.
+2. **The ID parse rule: trailing digits.** The item number is the
+   trailing all-digit segment; initiative slugs are refused a trailing
+   all-digit segment at registration. (Graduation verifies the full
+   slug charset is branch-, label-, and subject-safe.)
+3. **Scope defaults: whole corpus.** No flag keeps today's meaning on
+   search, status, and audit; narrowing is always explicit.
+4. **The graph: materialize now.** Initiative nodes and their derived
+   edges land in this build rather than waiting for a later need.
+5. **Legacy assignment: `hits` and `chronicle`, backfilled by us.**
+   Every legacy item except chronicle's assigns to the `hits`
+   initiative (the initiative and project vocabularies knowingly share
+   that slug); we register `chronicle` and assign item 27 ourselves as
+   install operators — the owner accepts naming that slug without the
+   other group's input, trading the one-way door for an unblocked
+   migration. The frozen bare sequence needs nothing beyond "no new
+   mints"; the audit walks it as a fixed range.
 
 ## Path from here
 
-Graduation through [playbook 02](../../00-META/process/02-graduation.md):
+Nothing is open: the shape above plus the settled answers are the
+complete input. Graduation through
+[playbook 02](../../00-META/process/02-graduation.md) transcribes them —
 a decision record for the initiative concept and its non-goals, an
-item-model.md amendment (vocabulary section) plus ops-log.md op-catalog
-rows, then the build handoff ([playbook 04](../../00-META/process/04-build-handoff.md))
-to the `hits` repo — contract, node, client, CLI, MCP, in the spec-kit
-flow. Backfill of the existing registry rides the same work, as ops
-with provenance.
+item-model.md amendment (vocabulary and ID sections) plus ops-log.md
+op-catalog rows, then the build handoff
+([playbook 04](../../00-META/process/04-build-handoff.md)) to the
+`hits` repo — contract, node, client, CLI, MCP, graph, in the spec-kit
+flow. Backfill of the existing corpus — registrations, the `hits` and
+`chronicle` assignments — rides the same work, as ops with provenance.

@@ -66,4 +66,7 @@ facts, the incident, and the open questions — including the effort's
 initial position (one install per group), kept as the record of where
 the thinking started. [`02-proposal.md`](02-proposal.md) reverses it on
 question 1's answer and proposes initiatives: the model, the surfaces,
-the non-goals, and the open questions graduation must settle.
+the non-goals — and, as of the owner review of 2026-09-11, every open
+question settled (`initiative select` filing, trailing-digits parse,
+whole-corpus defaults, graph nodes now, `hits`/`chronicle` backfill).
+The effort is ready to graduate through playbook 02.
