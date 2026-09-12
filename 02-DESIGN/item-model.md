@@ -4,7 +4,7 @@ code: hits
 updated: 2026-09-12
 lands:
   - { repo: hits, pr: "impire-io/hits#26", after: [] }
-  - { repo: hits-hq, pr: "impire-io/hits-hq#PENDING", after: [hits] }
+  - { repo: hits-hq, pr: "impire-io/hits-hq#10", after: [hits] }
 ---
 
 # The item model
