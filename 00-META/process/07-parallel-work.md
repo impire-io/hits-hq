@@ -28,12 +28,12 @@ One string — the branch name in **every** repo the work touches, the workspace
 
 | Work | ID |
 |---|---|
-| Rooted in a tracker item — a bug, task, or improvement (decision [0013](../../03-DECISIONS/0013-issue-tracking-cutover.md)) | that item's bare integer ID (`17`): branch `17`, workspace `.work/17/`, label `work/17` |
+| Rooted in a tracker item — a bug, task, or improvement (decisions [0013](../../03-DECISIONS/0013-issue-tracking-cutover.md), [0016](../../03-DECISIONS/0016-initiatives.md)) | that item's initiative-prefixed ID (`hits-19`): branch `hits-19`, workspace `.work/hits-19/`, label `work/hits-19`. Pre-0016 legacy items keep their bare IDs (`17`), same rule |
 | Rooted in a hits-hq research or decision record | that record's number and slug (`002-idp-token-exchange`) |
 | Rooted in a code repo's spec-kit feature | that feature's number and slug (`019-search-endpoint`) |
 | Anything else — a chore, a bugfix, a process change | a bare descriptive slug, no number (`work-id-rule-takes-existing-numbers`) |
 
-A bare integer is always a tracker item — spec-kit features cannot collide with it because a feature always carries a slug. Spec-kit numbers stay per-repo; cross-repo work roots in a tracker item or an hq record, as below. An integer ID always fits GitHub's 50-char label cap, which the old folder slugs did not (the pain item 3 recorded cannot recur).
+A work ID that parses as an item ID — initiative-prefixed (`hits-19`) or a legacy bare integer — is always a tracker item; spec-kit features cannot collide with either because a feature's slug *leads* with its number (`019-search-endpoint`) and an initiative slug never *ends* in one (decision [0016](../../03-DECISIONS/0016-initiatives.md)). Spec-kit numbers stay per-repo; cross-repo work roots in a tracker item or an hq record, as below. Prefixed IDs still fit GitHub's 50-char label cap, which the old folder slugs did not (the pain item 3 recorded cannot recur).
 
 A slug is a first-class ID, not a fallback. It is still the branch name everywhere, still the workspace directory, still the PR label, and one org-wide PR query still recovers the whole piece of work. The ID buys a link to a record; where no record exists yet, there is nothing to link to and nothing is lost.
 
