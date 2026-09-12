@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-06
+updated: 2026-09-12
 lands:
 ---
 
@@ -41,7 +41,7 @@ Endpoints, under `hits.api.`:
 
 | Endpoint | Does |
 |---|---|
-| `create` | mint an ID, append `created`, return the item |
+| `create` | mint an ID from the named initiative's counter, append `created`, return the item |
 | `get` | snapshot from KV; optionally the recent revisions the bucket's history holds |
 | `edit` | non-lifecycle property changes |
 | `transition` | status moves, closing transitions carrying `fixed-by` / `amended-design` |
@@ -50,7 +50,8 @@ Endpoints, under `hits.api.`:
 | `link` / `unlink` | typed edges |
 | `note` | append a trail entry |
 | `tombstone` | void a filing mistake |
-| `project.register` / `project.retire` / `project.list` | the `located-in` vocabulary — CAS-guarded registration, retirement (decision [0015](../03-DECISIONS/0015-project-retirement.md)), listing from the registry projection (retired slugs dropped) |
+| `project.register` / `project.assign` / `project.retire` / `project.list` | the `located-in` vocabulary — CAS-guarded registration naming the project's initiative, assignment (a move or the pre-0016 backfill), retirement (decision [0015](../03-DECISIONS/0015-project-retirement.md)), listing from the registry projection (retired slugs dropped) |
+| `initiative.register` / `initiative.retire` / `initiative.list` | the initiative vocabulary (decision [0016](../03-DECISIONS/0016-initiatives.md)) — the 0015 lifecycle on its own subject; `select` is client configuration, not an endpoint |
 
 Machine-legible errors throughout: an invariant rejection names the invariant
 — agents are the first-class operators. Every command names its `actor`, a
@@ -70,19 +71,23 @@ resolves to an item ID, and state comes from `hits`.
 | Binary | Service | Index | Endpoints |
 |---|---|---|---|
 | `hits-index-graph` | `hits-graph` | in-memory adjacency | `hits.graph.neighbors` — the neighbors of a node (item, repo, or actor), filterable by edge type and direction; `hits.graph.walk` — bounded-depth traversal |
-| `hits-index-search` | `hits-search` | Bleve (scorch) | `hits.search.query` — full-text over reports and notes, filterable by type and status, paged |
+| `hits-index-search` | `hits-search` | Bleve (scorch) | `hits.search.query` — full-text over reports and notes, filterable by type, status, and initiative, paged |
 | `hits-index-semantic` | `hits-semantic` | chromem-go | `hits.semantic.query` — nearest items to a text, with scores |
 
 **The graph is wider than the links.** `hits-graph` holds the asserted
-item↔item links, and beside them materializes project and actor nodes with
-edges *derived* from properties and ops — `located-in`, `reported-by`,
-`claimed-by`, and `blocked-by` while a block on another item stands
-([`item-model.md`](item-model.md) § links). Exploration questions —
-everything located in one project, everything one actor has claimed — are
-graph queries without the write model carrying any of it. Project nodes
-carry their registered names from the `registered` ops; actor nodes exist
-only by reference; derived edges are recomputed on replay, like everything
-else in the index.
+item↔item links, and beside them materializes project, actor, and
+initiative nodes with edges *derived* from properties and ops —
+`located-in`, `reported-by`, `claimed-by`, `blocked-by` while a block on
+another item stands, project → initiative from registration and
+assignment, and item → initiative from the ID prefix or the legacy
+assignment ([`item-model.md`](item-model.md) § links, decision
+[0016](../03-DECISIONS/0016-initiatives.md)). Exploration questions —
+everything located in one project, everything one actor has claimed,
+everything under one initiative — are graph queries without the write
+model carrying any of it. Project and initiative nodes carry their
+registered names from the `registered` ops; actor nodes exist only by
+reference; derived edges are recomputed on replay, like everything else
+in the index.
 
 **Embeddings.** `hits-index-semantic` produces vectors through a configured
 OpenAI-API-compatible provider — base URL, API key, model name. It embeds

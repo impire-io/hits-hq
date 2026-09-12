@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-06
+updated: 2026-09-12
 lands:
 ---
 
@@ -33,6 +33,7 @@ Every op for an entity is published to exactly one subject:
 ```
 hits.ops.item.<id>
 hits.ops.project.<slug>
+hits.ops.initiative.<slug>
 ```
 
 The op type lives in the envelope, **not** in the subject. This is
@@ -68,9 +69,9 @@ them; the log reads as the item's history.
 
 | Op | Payload carries |
 |---|---|
-| `created` | type, report body, reporter, priority, and — when known at filing — `located-in`, `discovered-while` |
+| `created` | type, report body, reporter, priority, the item's initiative (echoed from the minted ID), and — when known at filing — `located-in`, `discovered-while` |
 | `noted` | a trail entry: text, author ([`item-model.md`](item-model.md) § bodies) |
-| `edited` | property changes outside the lifecycle: priority, `located-in`, `lands`, `discovered-while` |
+| `edited` | property changes outside the lifecycle: priority, `located-in`, `lands`, `discovered-while` — and `initiative`, legal only on legacy bare-ID items (decision [0016](../03-DECISIONS/0016-initiatives.md)) |
 | `transitioned` | target status; a closing transition also carries `fixed-by` / `amended-design` and the close date |
 | `claimed` | claimant; on a steal, the displaced claimant — attribution survives |
 | `released` | — |
@@ -79,10 +80,19 @@ them; the log reads as the item's history.
 | `linked` / `unlinked` | link type, target item |
 | `tombstoned` | reason |
 
-On `hits.ops.project.<slug>`, two ops — a project is vocabulary, not
-workflow, and this is the vocabulary's whole lifecycle
-([`item-model.md`](item-model.md) § projects and actors, decision
-[0015](../03-DECISIONS/0015-project-retirement.md)):
+On `hits.ops.project.<slug>`, three ops — a project is vocabulary, not
+workflow ([`item-model.md`](item-model.md) § projects and actors,
+decisions [0015](../03-DECISIONS/0015-project-retirement.md) and
+[0016](../03-DECISIONS/0016-initiatives.md)):
+
+| Op | Payload carries |
+|---|---|
+| `registered` | display name, description, the project's initiative |
+| `assigned` | the initiative — a move, or the backfill of a pre-0016 registration |
+| `retired` | reason — the slug leaves the vocabulary; history stands |
+
+On `hits.ops.initiative.<slug>`, the same two-op lifecycle projects got
+in 0015 ([`item-model.md`](item-model.md) § initiatives):
 
 | Op | Payload carries |
 |---|---|
@@ -129,25 +139,35 @@ after a missed ack, or a shared consumer across instances, reorders. So:
 
 ## Identifiers
 
-Item IDs come from the `system.item-counter` key in the state bucket,
-advanced by a CAS-update loop: read, increment, update-at-revision, retry on
-conflict. Same atomicity as the retired `allocate-issue.sh`'s commit-and-retry
-trick (the file-based filing rail this platform replaced, decision
-[0013](../03-DECISIONS/0013-issue-tracking-cutover.md)), without the git. IDs are dense, ordered, and never reused.
+Item IDs are initiative-prefixed — `<initiative>-<n>` — with `n` from the
+initiative's own counter, `system.item-counter.<slug>` in the state
+bucket, advanced by a CAS-update loop: read, increment,
+update-at-revision, retry on conflict. Same atomicity as the retired
+`allocate-issue.sh`'s commit-and-retry trick (the file-based filing rail
+this platform replaced, decision
+[0013](../03-DECISIONS/0013-issue-tracking-cutover.md)), without the git.
+Per initiative, numbers are dense, ordered, and never reused; the item
+number is the trailing all-digit segment of the ID, unambiguous because
+initiative slugs are refused a trailing all-digit segment (decision
+[0016](../03-DECISIONS/0016-initiatives.md)). The pre-0016 bare counter,
+`system.item-counter`, freezes as the legacy range's marker — bare IDs
+stand forever, and nothing new mints from it.
 
-The counter is also derived: replay raises it to at least the highest item ID
-the log names, so it carries the same delete-and-replay guarantee as the
-snapshots (§ the state projection). The one edge this accepts: an ID minted
-for an op that never landed is reissued after a rebuild — harmless, since the
-log never named it and nothing can refer to it.
+Each counter is also derived: replay raises it to at least the highest
+number the log names for its initiative, so it carries the same
+delete-and-replay guarantee as the snapshots (§ the state projection).
+The one edge this accepts: an ID minted for an op that never landed is
+reissued after a rebuild — harmless, since the log never named it and
+nothing can refer to it.
 
-Project slugs are chosen, not minted. Uniqueness needs no counter: the
-`registered` op publishes with expected subject sequence zero, so a second
-registration of the same slug is rejected by the same CAS that orders item
-writes. The same CAS is what makes retirement permanent — a retired slug's
-subject already carries ops, so re-registering it is rejected without any
-machinery of its own (decision
-[0015](../03-DECISIONS/0015-project-retirement.md)).
+Project and initiative slugs are chosen, not minted. Uniqueness needs no
+counter: the `registered` op publishes with expected subject sequence
+zero, so a second registration of the same slug is rejected by the same
+CAS that orders item writes. The same CAS is what makes retirement
+permanent — a retired slug's subject already carries ops, so
+re-registering it is rejected without any machinery of its own (decision
+[0015](../03-DECISIONS/0015-project-retirement.md), extended to
+initiatives by [0016](../03-DECISIONS/0016-initiatives.md)).
 
 ## The state projection
 
@@ -156,14 +176,17 @@ machinery of its own (decision
 prefix:
 
 ```
-item.<id>        the item snapshot plus the last-applied sequence
-project.<slug>   the registry hits-node validates located-in against
-system.<key>     operational keys — today only system.item-counter
+item.<id>            the item snapshot plus the last-applied sequence
+project.<slug>       the registry hits-node validates located-in against
+initiative.<slug>    the registry create and project ops validate against
+system.<key>         operational keys — the per-initiative counters
+                     system.item-counter.<slug>, and the frozen legacy
+                     system.item-counter
 ```
 
-The prefixes are collision-free by construction: item IDs are dense decimals
-and project slugs are lowercase `[a-z0-9-]`, so no key of one kind can spell
-a prefix of another. Per-key history on the bucket serves "the last few
+The prefixes are collision-free by construction: the kind is the first
+dotted segment, and within `item.` the prefixed IDs and legacy decimals
+cannot collide because bare numbers are not valid initiative slugs. Per-key history on the bucket serves "the last few
 states" natively — no extra machinery. The whole bucket is a projection like
 any other: delete it and replay reproduces everything in it — snapshots,
 registry, and counter alike — and it is wrong by definition wherever it
