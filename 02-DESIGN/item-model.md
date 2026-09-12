@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-06
+updated: 2026-09-12
 lands:
 ---
 
@@ -15,12 +15,23 @@ is [`ops-log.md`](ops-log.md), the surface is [`services.md`](services.md).
 
 ## Identity
 
-An item's ID is a decimal integer, minted atomically at creation
-([`ops-log.md`](ops-log.md)), rendered as a string without padding. It is
-subject-token-safe by construction and it is the **work ID**: the branch name,
-the workspace directory, the PR label ([playbook
-07](../00-META/process/07-parallel-work.md)). IDs are never reused, including
-for tombstoned items.
+An item's ID is initiative-prefixed: `<initiative>-<n>` — `hits-19`,
+`chronicle-hq-4` — with `n` minted atomically from that initiative's dense
+counter at creation ([`ops-log.md`](ops-log.md), decision
+[0016](../03-DECISIONS/0016-initiatives.md)). The item number is the
+trailing all-digit segment, unambiguous because an initiative slug is
+refused a trailing all-digit segment at registration. The ID carries the
+item's initiative — intrinsic from filing, immutable for life — and it is
+subject-token-safe, branch-safe, and label-safe by construction: it is the
+**work ID** — the branch name, the workspace directory, the PR label
+([playbook 07](../00-META/process/07-parallel-work.md)). IDs are never
+reused, including for tombstoned items.
+
+**Legacy IDs are grandfathered.** Items minted before initiatives carry
+bare decimal IDs (`17`); they keep them forever — refs, merged branches,
+and the ops-log cite them — and their frozen counter mints nothing new. A
+legacy item takes its initiative by an ordinary edit, the one place an
+item's initiative is writable.
 
 ## Type
 
@@ -35,6 +46,7 @@ for tombstoned items.
 | Property | Set | Meaning |
 |---|---|---|
 | `type` | at creation | `bug` \| `task` \| `improvement` |
+| `initiative` | at creation | intrinsic in the ID ([above](#identity)); editable only on legacy bare-ID items |
 | `status` | by transition | see lifecycle below |
 | `priority` | anytime | `high` \| `normal` \| `low` — triage signal only, defaults `normal` |
 | `created`, `reporter` | at creation | explicit now — git history no longer carries them |
@@ -88,6 +100,11 @@ violate one is rejected, never partially applied.
 - A `task` cannot be created without `located-in`.
 - `located-in` names only registered projects — the registry is what makes
   this and the previous invariant real checks rather than shape checks.
+- Creation names a registered, unretired initiative — the mint needs it —
+  and `located-in` may name only projects of the item's own initiative: an
+  item cannot span initiatives, by construction.
+- `initiative` is writable by edit only on legacy bare-ID items; on a
+  prefixed item it is immutable in the ID.
 - Every command carries an `actor`, validated for form.
 - Every free-text field fits its byte budget — bodies 8 KiB, labels 1 KiB
   (decision [0014](../03-DECISIONS/0014-op-text-budgets.md)); over budget
@@ -141,6 +158,30 @@ none of it. This also removes a wart: a block on another item needs no
 hand-made companion link — the edge is derived while the block stands and
 drops when it lifts, which is why `blocks` is not in the assertable set.
 
+## Initiatives
+
+An **initiative** is a named group of projects — the shape of real work,
+where a team or a person combines several repos into one effort (decision
+[0016](../03-DECISIONS/0016-initiatives.md)). It is the second registered
+vocabulary: `{slug, name, description}` with exactly the project lifecycle
+— register and retire, reason required, retired slugs never re-registered
+or reused, history standing. Slugs are lowercase `[a-z0-9-]` with no
+trailing all-digit segment (the ID parse rule, [above](#identity)).
+
+**An initiative is a lens, not a wall.** The account remains the only
+isolation boundary (decision [0004](../03-DECISIONS/0004-hits-up.md));
+every caller reads the whole corpus, and cross-initiative visibility is a
+feature. Initiatives give tools a marked line: `--initiative` narrows
+search, the status view, and the audit, and without it every reader keeps
+the whole corpus. The client config carries a *selected* initiative
+(`hits initiative select`, beside the default actor) — a filing default
+for the mint, never a read scope. Hard restrictions, if ever, arrive at
+the account edge (auth-callout), not in the model.
+
+Every project belongs to exactly one initiative — named at registration,
+changed (and backfilled) by assignment. An item's initiative is intrinsic
+in its ID; its `located-in` is validated against it.
+
 ## Projects and actors
 
 A **project** is the unit of ownership — what `located-in` points at. In the
@@ -148,10 +189,12 @@ hits install today, a project is a repo; the model term is deliberately more
 general. Projects are registered vocabulary, not workflow: a thin entity
 with a chosen subject-token-safe slug, a display name, and a description,
 created by a registration op on its own subject ([`ops-log.md`](ops-log.md))
-and referenced by items from then on. No status, no notes, no workflow —
-machinery a vocabulary does not need. Registration is what keeps one typo
-from silently splitting the symptom→component memory, and the install's
-registry mirrors [`repos.md`](../00-META/repos.md) by hand.
+and referenced by items from then on — and naming its initiative
+([above](#initiatives)). No status, no notes, no workflow — machinery a
+vocabulary does not need. Registration is what keeps one typo from
+silently splitting the symptom→component memory, and each initiative's
+registry rows mirror its governing repo's
+[`repos.md`](../00-META/repos.md) by hand.
 
 A project leaves the vocabulary by **retirement** — a `retired` op with a
 required reason, for the mistyped or superseded slug (decision

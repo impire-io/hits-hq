@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-06
+updated: 2026-09-12
 ---
 
 # The MCP server — `hits-mcp`
@@ -60,8 +60,12 @@ change.
 | `note_item` | `hits.api.note` | ✓ |
 | `tombstone_item` | `hits.api.tombstone` | ✓ |
 | `register_project` | `hits.api.project.register` | ✓ |
+| `assign_project` | `hits.api.project.assign` | ✓ |
 | `retire_project` | `hits.api.project.retire` | ✓ |
 | `list_projects` | `hits.api.project.list` | |
+| `register_initiative` | `hits.api.initiative.register` | ✓ |
+| `retire_initiative` | `hits.api.initiative.retire` | ✓ |
+| `list_initiatives` | `hits.api.initiative.list` | |
 | `search_items` | `hits.search.query` | |
 | `semantic_search` | `hits.semantic.query` | |
 | `graph_neighbors` | `hits.graph.neighbors` | |
@@ -82,7 +86,11 @@ its own: the names an agent reads in a tool schema are the names in
 The acting handle is server configuration, required at startup — a flag or
 `HITS_ACTOR`, the CLI's convention — validated for form at boot and stamped
 on every write. Tools carry no actor parameter and no override: one process
-is one actor. Authority is the caller's claim until identity derives from
+is one actor. The default initiative is the same shape, optional: a startup
+flag mirroring the CLI's selected initiative, feeding `create_item` when
+the call names none (decision
+[0016](../03-DECISIONS/0016-initiatives.md)) — a filing default, never a
+read scope. Authority is the caller's claim until identity derives from
 NATS authentication, at which point the startup actor is verified rather
 than claimed (decision [0002](../03-DECISIONS/0002-projects-and-actors.md)).
 

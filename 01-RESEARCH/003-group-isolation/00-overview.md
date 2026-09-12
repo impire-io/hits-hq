@@ -1,5 +1,6 @@
 ---
-status: active
+status: graduated
+became: ../../02-DESIGN/item-model.md
 ---
 
 # 003 — Group isolation: multiple groups of projects in one HITS install
@@ -20,7 +21,12 @@ initiative as a lens, not a wall, with decision
 [0004](../../03-DECISIONS/0004-hits-up.md)'s account boundary untouched
 as the only hard isolation, and item IDs initiative-prefixed
 (`hits-19`) from dense per-initiative sequences, legacy bare IDs
-grandfathered.
+grandfathered. Graduated as decision
+[0016](../../03-DECISIONS/0016-initiatives.md) with amendments to
+[`item-model.md`](../../02-DESIGN/item-model.md),
+[`ops-log.md`](../../02-DESIGN/ops-log.md),
+[`services.md`](../../02-DESIGN/services.md), and
+[`mcp-server.md`](../../02-DESIGN/mcp-server.md).
 
 ## Why
 
@@ -69,4 +75,5 @@ question 1's answer and proposes initiatives: the model, the surfaces,
 the non-goals — and, as of the owner review of 2026-09-11, every open
 question settled (`initiative select` filing, trailing-digits parse,
 whole-corpus defaults, graph nodes now, `hits`/`chronicle` backfill).
-The effort is ready to graduate through playbook 02.
+The effort graduated through playbook 02 on 2026-09-12; the build
+handoff (playbook 04) to the `hits` repo follows.
