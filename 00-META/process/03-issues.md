@@ -21,7 +21,7 @@ If the install is unreachable, capture the symptom in the session trail and file
    hits create --type bug "<the symptom in plain terms and how it was observed>"
    ```
 
-   The report is the **symptom, not a diagnosis** — it is set at creation and never edited, so what was actually observed is exactly what the record keeps. `--discovered-while` is cheap context the next reader otherwise rediscovers; `--priority` only when it genuinely differs from normal. The printed integer ID names the item forever, and it is the **work ID** ([playbook 07](07-parallel-work.md)) if anyone picks the work up.
+   The report is the **symptom, not a diagnosis** — it is set at creation and never edited, so what was actually observed is exactly what the record keeps. `--discovered-while` is cheap context the next reader otherwise rediscovers; `--priority` only when it genuinely differs from normal. The ID mints from your **selected initiative** — `hits initiative select <slug>` once, `--initiative` to override per filing (decision [0016](../../03-DECISIONS/0016-initiatives.md)) — and the printed initiative-prefixed ID (`hits-29`) names the item forever: it is the **work ID** ([playbook 07](07-parallel-work.md)) if anyone picks the work up.
 
    A **task** is a deferred follow-up (sync docs, rename, hand a design off). It already knows its repo, so it files with `--project <slug>` — the tracker enforces this — and skips straight to step 4: no diagnosis. An **improvement** takes either path, by whether its owner is known at filing. The one-line way to file a task mid-flow is the [`hits-defer`](../../.claude/skills/hits-defer/SKILL.md) skill.
 
