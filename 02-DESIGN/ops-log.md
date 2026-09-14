@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-12
+updated: 2026-09-14
 lands:
 ---
 
@@ -34,6 +34,7 @@ Every op for an entity is published to exactly one subject:
 hits.ops.item.<id>
 hits.ops.project.<slug>
 hits.ops.initiative.<slug>
+hits.ops.release.<initiative>.<slug>
 ```
 
 The op type lives in the envelope, **not** in the subject. This is
@@ -42,6 +43,15 @@ deliberate: JetStream's per-subject compare-and-swap
 CAS is what serializes writes per entity. A varying trailing token would
 break it. Consumers consume `hits.ops.>` and switch on the subject kind and
 the envelope.
+
+The release subject carries two parts because release slugs are unique
+per initiative, not globally, and may contain dots (`0.5` — decision
+[0017](../03-DECISIONS/0017-release-targeting.md)): the dots stand as
+literal subject separators, and the parse is unambiguous by
+construction — initiative slugs contain no dots, so the initiative is
+the first token after the kind and the release slug is everything
+after it, rejoined. The CAS is untouched: it works on the exact
+subject string, however it tokenizes.
 
 ## The envelope
 
@@ -69,9 +79,9 @@ them; the log reads as the item's history.
 
 | Op | Payload carries |
 |---|---|
-| `created` | type, report body, reporter, priority, the item's initiative (echoed from the minted ID), and — when known at filing — `located-in`, `discovered-while` |
+| `created` | type, report body, reporter, priority, the item's initiative (echoed from the minted ID), and — when known at filing — `located-in`, `target`, `discovered-while` |
 | `noted` | a trail entry: text, author ([`item-model.md`](item-model.md) § bodies) |
-| `edited` | property changes outside the lifecycle: priority, `located-in`, `lands`, `discovered-while` — and `initiative`, legal only on legacy bare-ID items (decision [0016](../03-DECISIONS/0016-initiatives.md)) |
+| `edited` | property changes outside the lifecycle: priority, `located-in`, `target`, `lands`, `discovered-while` — and `initiative`, legal only on legacy bare-ID items (decision [0016](../03-DECISIONS/0016-initiatives.md)) |
 | `transitioned` | target status; a closing transition also carries `fixed-by` / `amended-design` and the close date |
 | `claimed` | claimant; on a steal, the displaced claimant — attribution survives |
 | `released` | — |
@@ -97,6 +107,17 @@ in 0015 ([`item-model.md`](item-model.md) § initiatives):
 | Op | Payload carries |
 |---|---|
 | `registered` | display name, description |
+| `retired` | reason — the slug leaves the vocabulary; history stands |
+
+On `hits.ops.release.<initiative>.<slug>`, the 0015 lifecycle plus the
+one terminal op a ship point needs ([`item-model.md`](item-model.md)
+§ releases, decision
+[0017](../03-DECISIONS/0017-release-targeting.md)):
+
+| Op | Payload carries |
+|---|---|
+| `registered` | display name, description |
+| `shipped` | verifiable refs — tag, commit, artifact — plus an optional note; refused (`open-targets`) while any non-terminal item targets the release |
 | `retired` | reason — the slug leaves the vocabulary; history stands |
 
 ## Ordering
@@ -160,14 +181,18 @@ The one edge this accepts: an ID minted for an op that never landed is
 reissued after a rebuild — harmless, since the log never named it and
 nothing can refer to it.
 
-Project and initiative slugs are chosen, not minted. Uniqueness needs no
-counter: the `registered` op publishes with expected subject sequence
-zero, so a second registration of the same slug is rejected by the same
-CAS that orders item writes. The same CAS is what makes retirement
-permanent — a retired slug's subject already carries ops, so
-re-registering it is rejected without any machinery of its own (decision
+Project, initiative, and release slugs are chosen, not minted.
+Uniqueness needs no counter: the `registered` op publishes with expected
+subject sequence zero, so a second registration of the same slug is
+rejected by the same CAS that orders item writes. The same CAS is what
+makes retirement — and, for releases, shipping — permanent: a terminal
+slug's subject already carries ops, so re-registering it is rejected
+without any machinery of its own (decision
 [0015](../03-DECISIONS/0015-project-retirement.md), extended to
-initiatives by [0016](../03-DECISIONS/0016-initiatives.md)).
+initiatives by [0016](../03-DECISIONS/0016-initiatives.md) and to
+releases by [0017](../03-DECISIONS/0017-release-targeting.md)). A
+release slug's uniqueness is per initiative — its subject carries both,
+so the CAS scope and the uniqueness scope are the same subject.
 
 ## The state projection
 
@@ -176,12 +201,13 @@ initiatives by [0016](../03-DECISIONS/0016-initiatives.md)).
 prefix:
 
 ```
-item.<id>            the item snapshot plus the last-applied sequence
-project.<slug>       the registry hits-node validates located-in against
-initiative.<slug>    the registry create and project ops validate against
-system.<key>         operational keys — the per-initiative counters
-                     system.item-counter.<slug>, and the frozen legacy
-                     system.item-counter
+item.<id>                        the item snapshot plus the last-applied sequence
+project.<slug>                   the registry hits-node validates located-in against
+initiative.<slug>                the registry create and project ops validate against
+release.<initiative>.<slug>      the registry target writes and ship validate against
+system.<key>                     operational keys — the per-initiative counters
+                                 system.item-counter.<slug>, and the frozen legacy
+                                 system.item-counter
 ```
 
 The prefixes are collision-free by construction: the kind is the first

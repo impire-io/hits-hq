@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-12
+updated: 2026-09-14
 lands:
 ---
 
@@ -52,6 +52,7 @@ Endpoints, under `hits.api.`:
 | `tombstone` | void a filing mistake |
 | `project.register` / `project.assign` / `project.retire` / `project.list` | the `located-in` vocabulary — CAS-guarded registration naming the project's initiative, assignment (a move or the pre-0016 backfill), retirement (decision [0015](../03-DECISIONS/0015-project-retirement.md)), listing from the registry projection (retired slugs dropped) |
 | `initiative.register` / `initiative.retire` / `initiative.list` | the initiative vocabulary (decision [0016](../03-DECISIONS/0016-initiatives.md)) — the 0015 lifecycle on its own subject; `select` is client configuration, not an endpoint |
+| `release.register` / `release.ship` / `release.retire` / `release.list` | the `target` vocabulary (decision [0017](../03-DECISIONS/0017-release-targeting.md)) — per-initiative registration, shipping with verifiable refs, retirement with reason, listing from the registry projection. `ship` validates the straggler gate by reading open-item snapshots — shipping is rare, a scan is acceptable, no reverse index enters the write model |
 
 Machine-legible errors throughout: an invariant rejection names the invariant
 — agents are the first-class operators. Every command names its `actor`, a
@@ -71,21 +72,25 @@ resolves to an item ID, and state comes from `hits`.
 | Binary | Service | Index | Endpoints |
 |---|---|---|---|
 | `hits-index-graph` | `hits-graph` | in-memory adjacency | `hits.graph.neighbors` — the neighbors of a node (item, repo, or actor), filterable by edge type and direction; `hits.graph.walk` — bounded-depth traversal |
-| `hits-index-search` | `hits-search` | Bleve (scorch) | `hits.search.query` — full-text over reports and notes, filterable by type, status, and initiative, paged |
+| `hits-index-search` | `hits-search` | Bleve (scorch) | `hits.search.query` — full-text over reports and notes, filterable by type, status, initiative, and target, paged |
 | `hits-index-semantic` | `hits-semantic` | chromem-go | `hits.semantic.query` — nearest items to a text, with scores |
 
 **The graph is wider than the links.** `hits-graph` holds the asserted
-item↔item links, and beside them materializes project, actor, and
-initiative nodes with edges *derived* from properties and ops —
-`located-in`, `reported-by`, `claimed-by`, `blocked-by` while a block on
-another item stands, project → initiative from registration and
-assignment, and item → initiative from the ID prefix or the legacy
-assignment ([`item-model.md`](item-model.md) § links, decision
+item↔item links, and beside them materializes project, actor,
+initiative, and release nodes with edges *derived* from properties and
+ops — `located-in`, `reported-by`, `claimed-by`, `blocked-by` while a
+block on another item stands, item → release `targets` while a
+`target` is set (decision
+[0017](../03-DECISIONS/0017-release-targeting.md)), project →
+initiative from registration and assignment, and item → initiative
+from the ID prefix or the legacy assignment
+([`item-model.md`](item-model.md) § links, decision
 [0016](../03-DECISIONS/0016-initiatives.md)). Exploration questions —
 everything located in one project, everything one actor has claimed,
-everything under one initiative — are graph queries without the write
-model carrying any of it. Project and initiative nodes carry their
-registered names from the `registered` ops; actor nodes exist only by
+everything under one initiative, everything still aiming at one
+release — are graph queries without the write model carrying any of
+it. Project, initiative, and release nodes carry their registered
+names from the `registered` ops; actor nodes exist only by
 reference; derived edges are recomputed on replay, like everything else
 in the index.
 
@@ -104,8 +109,10 @@ only.
 - No external index stores yet, and no config knobs for them — the store
   interface is the extension point when a real need arrives.
 - No cross-item query in `hits` itself — list, search, and exploration belong
-  to the indexers. (`project.list` is the one exception: a small closed
-  vocabulary read from the registry projection, not a query.)
+  to the indexers. (The vocabulary lists — `project.list`,
+  `initiative.list`, `release.list` — are the exception: small closed
+  registry reads, not queries. `release.ship`'s straggler gate is a
+  write-time invariant check, not a query surface.)
 - No user records — an actor is a handle on the op, nothing more, until a
   real consumer appears.
 

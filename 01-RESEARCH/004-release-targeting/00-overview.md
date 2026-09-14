@@ -1,5 +1,6 @@
 ---
-status: active
+status: graduated
+became: ../../02-DESIGN/item-model.md
 ---
 
 # 004 — Release targeting: assigning items to a release
@@ -22,9 +23,16 @@ As of the owner review of 2026-09-14, every open question is settled
 (vocabulary not item; shipping refused while open items target the
 release; composition as the record with no second field; bare
 initiative-scoped slugs with no global reference form; audit as
-invariant net only). The effort is ready to graduate through
-[playbook 02](../../00-META/process/02-graduation.md) into a design
-amendment and decision.
+invariant net only). Graduated the same day through
+[playbook 02](../../00-META/process/02-graduation.md) as decision
+[0017](../../03-DECISIONS/0017-release-targeting.md), with amendments
+to [`item-model.md`](../../02-DESIGN/item-model.md),
+[`ops-log.md`](../../02-DESIGN/ops-log.md),
+[`services.md`](../../02-DESIGN/services.md), and
+[`mcp-server.md`](../../02-DESIGN/mcp-server.md). The build hands off
+to the `hits` repo through
+[playbook 04](../../00-META/process/04-build-handoff.md); tracker item
+hits-3 carries the landing order.
 
 ## Why
 

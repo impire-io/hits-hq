@@ -1,10 +1,8 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-12
+updated: 2026-09-14
 lands:
-  - { repo: hits, pr: "impire-io/hits#26", after: [] }
-  - { repo: hits-hq, pr: "impire-io/hits-hq#10", after: [hits] }
 ---
 
 # The item model
@@ -51,6 +49,7 @@ item's initiative is writable.
 | `initiative` | at creation | intrinsic in the ID ([above](#identity)); editable only on legacy bare-ID items |
 | `status` | by transition | see lifecycle below |
 | `priority` | anytime | `high` \| `normal` \| `low` — triage signal only, defaults `normal` |
+| `target` | at creation or anytime while active | the release the item aims at — a release slug of the item's own initiative ([below](#releases)); absent means someday |
 | `created`, `reporter` | at creation | explicit now — git history no longer carries them |
 | `claimed-by`, `claimed` | claim/release | intent to work it, not started work; both set or neither |
 | `blocked-by` | while blocked | the thing being waited on: an item ref or plain prose |
@@ -105,6 +104,13 @@ violate one is rejected, never partially applied.
 - Creation names a registered, unretired initiative — the mint needs it —
   and `located-in` may name only projects of the item's own initiative: an
   item cannot span initiatives, by construction.
+- `target` may name only a registered, **unshipped, unretired** release of
+  the item's own initiative (refusals `unknown-release`,
+  `release-shipped`, `release-retired`); the terminal-item edit refusal
+  freezes it at close.
+- A release `ship` is refused while any non-terminal item targets the
+  release (`open-targets`); shipped and retired releases accept no
+  further ops ([below](#releases)).
 - `initiative` is writable by edit only on legacy bare-ID items; on a
   prefixed item it is immutable in the ID.
 - Every command carries an `actor`, validated for form.
@@ -141,19 +147,22 @@ fact each one is:
   the system, and the relation exists because someone stated it and someone
   can retract it.
 - **References outside the item graph** — `located-in` (projects),
-  `discovered-while`, a `blocked-by` naming an external party — stay
-  properties. A project is registered vocabulary, not workflow
-  ([below](#projects-and-actors)); the reference is a fact about the item,
-  consumed by the item's own invariants ("a task opens with `located-in`"),
-  not an edge asserted and retracted in its own right.
+  `target` (releases), `discovered-while`, a `blocked-by` naming an
+  external party — stay properties. A project or a release is registered
+  vocabulary, not workflow ([below](#projects-and-actors),
+  [releases](#releases)); the reference is a fact about the item,
+  consumed by the item's own invariants ("a task opens with `located-in`",
+  "`target` names an unshipped release"), not an edge asserted and
+  retracted in its own right.
 - **Attribution** — `reporter`, `claimed-by` — is never assertable at all: it
   is derived from the `actor` on the `created` and `claimed` ops. A link can
   be added and removed; provenance cannot.
 
 The graph still sees all of it. The graph index is a projection, and a
-projection may reshape: it materializes project and actor nodes and derives
-edges from properties and ops — `located-in`, `reported-by`, `claimed-by`,
-and `blocked-by` for the duration of a block whose blocker is an item
+projection may reshape: it materializes project, actor, and release nodes
+and derives edges from properties and ops — `located-in`, `reported-by`,
+`claimed-by`, `targets` while a `target` is set, and `blocked-by` for the
+duration of a block whose blocker is an item
 ([`services.md`](services.md)). So "everything located in one project" and
 "everything one actor claimed" are graph queries, and the write model carries
 none of it. This also removes a wart: a block on another item needs no
@@ -183,6 +192,54 @@ the account edge (auth-callout), not in the model.
 Every project belongs to exactly one initiative — named at registration,
 changed (and backfilled) by assignment. An item's initiative is intrinsic
 in its ID; its `located-in` is validated against it.
+
+## Releases
+
+A **release** is the third registered vocabulary: a named ship point
+within an initiative (decision
+[0017](../03-DECISIONS/0017-release-targeting.md)), what an item's
+`target` points at. `{slug, name, description}`, registered per
+initiative; slugs are lowercase `[a-z0-9.-]` with every dot-separated
+segment non-empty — dots are wanted, releases are usually versions
+(`0.5`) — and per-initiative uniqueness comes from the same CAS that
+guards the other vocabularies ([`ops-log.md`](ops-log.md)
+§ identifiers).
+
+**The lifecycle is register → shipped | retired.** `shipped` is the
+terminal op for a release that happened, carrying verifiable refs —
+tag, commit, artifact — plus an optional note, the way a resolving
+transition carries `fixed-by`: the milestone and the release artifact
+are the same fact. `retired` is what decision
+[0015](../03-DECISIONS/0015-project-retirement.md) made it — the exit
+for the mistyped or abandoned slug, reason required. Both are
+terminal; a shipped or retired slug is never re-registered or reused.
+Retirement stays guardless: a release some item still targets can
+retire — new `target` writes refuse the retired slug, existing values
+stand, and the audit nets the strays.
+
+**Shipping is refused while any non-terminal item targets the
+release.** The cut *is* the triage pass: re-target or clear each
+straggler first, so the moment of shipping is also the moment the
+next release's scope gets honest. This is the one place the model
+demands a human pass, and deliberately the only one.
+
+**Plan becomes record by composition.** `target` on an active item is
+plan; terminal-is-terminal freezes it at close, the unshipped-target
+invariant stops late writes, and the straggler gate empties the
+release before it ships — so "resolved, targeted `0.5`, `0.5`
+shipped" *is* "shipped in 0.5", with no second field and no
+reinterpretation.
+
+**Absence of target is "someday" — and that is the whole someday
+mechanism.** No someday release, no icebox, no horizon buckets, no
+dates on releases, no timebox axis, no tracked progress, no release
+hierarchy, no multi-release items: each refusal maps to a documented
+failure mode in the survey behind decision 0017. An untargeted item
+sits in the corpus as what the corpus already is —
+symptom→component memory — and `wontfix` with reasoning on the
+record keeps the untargeted pool honest. The release view — "what
+must still land in `0.5`" — is a query over open items, never a
+curated document, and progress is derivable, never tracked.
 
 ## Projects and actors
 
