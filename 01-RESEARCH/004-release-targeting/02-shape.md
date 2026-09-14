@@ -1,10 +1,12 @@
 # Candidate shape: releases in hits
 
 A sketch mapping the survey's convergent findings
-([`01-survey.md`](01-survey.md)) onto the existing model — for owner
-review, not yet a proposal. The design bar: answer "what must still
-land in this release" as a query, and refuse every hinge the survey
-identified as the opening of the box.
+([`01-survey.md`](01-survey.md)) onto the existing model. The design
+bar: answer "what must still land in this release" as a query, and
+refuse every hinge the survey identified as the opening of the box.
+Reviewed by the owner on 2026-09-14; every open question settled —
+the settlements are recorded [below](#settled-by-owner-review-2026-09-14)
+and folded into the shape.
 
 ## The shape
 
@@ -56,37 +58,46 @@ The survey's four hinges, refused by construction:
   (closed/total over `targets` edges) if a view ever wants it;
   releases do not contain releases; items target at most one.
 - **No plan/record split.** One field, and the shipping op is what
-  turns plan into record — see open question 3.
+  turns plan into record — settlement 3 below.
 
-## Open questions
+## Settled by owner review (2026-09-14)
 
-1. **Vocabulary or item?** The sketch says vocabulary: a release is
-   referenced by many items, has a registered slug and a thin
-   lifecycle, and `target` stays a property like `located-in` — no
-   new link type, no workflow machinery on the release itself. The
-   alternative — a release as an ordinary `task` that other items
-   link to — reuses more, but overloads item lifecycle with
-   vocabulary semantics and makes "unshipped releases" a convention
-   rather than a query.
-2. **What does shipping require of stragglers?** GitLab documented
-   the wedge: cutting a release while open items still carry its
-   version. Proposed invariant: shipping is refused while any open
-   item targets the release — the cut *is* the triage pass
-   (re-target or clear each straggler first), so the moment of
+1. **Vocabulary, not item.** A release is the third registered
+   vocabulary: referenced by many items, a registered slug with a
+   thin lifecycle, `target` a property like `located-in` — no new
+   link type, no workflow machinery on the release. The alternative
+   (a release as an ordinary `task` other items link to) was
+   rejected: it overloads item lifecycle with vocabulary semantics
+   and makes "unshipped releases" a convention rather than a query.
+2. **Shipping is refused while any open item targets the release.**
+   GitLab documented the wedge — cutting a release while open items
+   still carry its version. Here the cut *is* the triage pass:
+   re-target or clear each straggler first, so the moment of
    shipping is also the moment the next release's scope gets honest.
-3. **Plan versus record.** JIRA's fixVersion rotted by answering
-   both. Here: `target` on an *active* item is plan; once the item
-   resolves and the release ships, the same field is record —
-   "resolved, targeted hits-0.5, hits-0.5 shipped" composes into
-   "shipped in 0.5" without a second field. Is that composition
-   enough, or does the resolving transition need to freeze the
-   target explicitly?
-4. **Slug hygiene.** Release slugs live in the same flat
-   subject-token space as project slugs, scoped per initiative —
-   `hits-0.5` reads naturally but must not collide with item ID
-   parsing (`hits-19`). Dots make release slugs parse-distinct from
-   item numbers; is that rule enough, or do releases need their own
-   namespace marker?
-5. **Does `hits audit` learn releases?** The audit's whole-corpus
-   walk could flag targets naming shipped releases on still-open
-   items — the one staleness this model can produce.
+3. **Composition is the record; no second field.** `target` on an
+   active item is plan; terminal-is-terminal freezes it at
+   resolution, and with the invariant that `target` may only name an
+   *unshipped* release, "resolved, targeted 0.5, 0.5 shipped"
+   composes airtight into "shipped in 0.5". Plan becomes record at
+   the explicit shipping op, never by reinterpretation — the
+   fixVersion two-questions rot is closed by construction. No
+   explicit freeze on the resolving transition.
+4. **Bare slug, initiative-scoped; no global reference form.**
+   `target` stores just the release's slug (`0.5`), validated
+   against the item's own initiative's releases — mirroring the rule
+   that `located-in` names only the item's initiative's projects.
+   With no global `<initiative>-<slug>` form, the item-ID parse
+   collision dissolves entirely; display composes it (`hits 0.5`).
+5. **Audit as invariant net, nothing dedicated.** The existing
+   whole-corpus walk also validates the release invariants — every
+   `target` names a known release of the item's initiative, no open
+   item targets a terminal release — catching only what slips past
+   write-time checks (replay drift, legacy paths), the way it
+   already nets other invariants. No release section, no new
+   surface: the cut-time readout is already one scoped query away.
+
+Consistency note on retirement: as with projects (decision
+[0015](../../03-DECISIONS/0015-project-retirement.md)), no guard
+prevents retiring a release some item still targets — new `target`
+writes refuse the retired slug, existing values stand, and the audit
+nets the strays via settlement 5's terminal-release check.

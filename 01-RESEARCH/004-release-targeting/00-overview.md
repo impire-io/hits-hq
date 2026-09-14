@@ -15,10 +15,16 @@ known failure. The effort opened with an external survey
 model milestones/releases, which lightweight planning methodologies
 survive contact with practice, and the specific mechanisms by which
 JIRA-style fix-version planning rots. The survey converged cleanly,
-and [`02-shape.md`](02-shape.md) carries a candidate shape for hits —
-a release as a third registered vocabulary, one nullable `target`
-property per item, and a short list of things deliberately not built —
-with its open questions listed for owner review.
+and [`02-shape.md`](02-shape.md) carries the shape for hits — a
+release as a third registered vocabulary, one nullable `target`
+property per item, and a short list of things deliberately not built.
+As of the owner review of 2026-09-14, every open question is settled
+(vocabulary not item; shipping refused while open items target the
+release; composition as the record with no second field; bare
+initiative-scoped slugs with no global reference form; audit as
+invariant net only). The effort is ready to graduate through
+[playbook 02](../../00-META/process/02-graduation.md) into a design
+amendment and decision.
 
 ## Why
 
