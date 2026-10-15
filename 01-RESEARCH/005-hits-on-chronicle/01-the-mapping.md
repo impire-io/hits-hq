@@ -247,6 +247,8 @@ Authors are unverified by construction (§ identity).
 
 ## The gap list
 
+> **Addressed 2026-10-15** — see [§ the gaps, addressed](#the-gaps-addressed) below; the list stands as it was found.
+
 What chronicle-38's fourth ask called the maturity gap list, from the
 rows above. Each item is an ask of chronicle-hq, a convention HITS
 adopts, or a decision of this effort — stated as which.
@@ -280,3 +282,20 @@ What holds as is, and needs no row: the effects, children, the full
 history, the guard, the create-only guard, history-sourced search and
 semantic over notes, the graph from fields, the streamed queries, the
 listings, and identity for every live writer.
+
+## The gaps, addressed
+
+2026-10-15, decision
+[0019](../../03-DECISIONS/0019-the-writer-is-the-client-the-store-does-not-require-verified-authors-and-a-release-lives-under-its-initiative.md),
+after checking the four facts its context lists against chronicle's code.
+
+| Gap | Outcome |
+|---|---|
+| 1 — an author a verified writer names | **Decided, no ask.** No sole-writer service, so no writer acts for a person; the store does not require verified authors, every live write goes through the node and is verified, the import writes the original actor as an asserted `Op-Author` — the writer's word, as it was in `hits-ops`. An attested import waits for a second solution that imports a history. |
+| 2 — a dot inside an instance id | **Convention.** An id segment is `[a-zA-Z0-9_-]+`: the underscore is legal, and neither slug grammar admits one, so `0.7.0` is `0_7_0`, reversibly. A release is a child of its initiative, `initiative/<initiative>/releases/<id>`. |
+| 3 — lifecycle rules | **Asked, and answered.** chronicle-75: an operation may declare a `precondition` — a JSON Schema the current state must satisfy — and the fold judges a merge's result against the type's schema as it judges a snapshot's; pre-flight on the SDK and on `APPLY` refuses what the fold would mark. chronicle-hq decision 0059, designs 03, 07 and 12 amended; the build follows. HITS's client package enforces regardless; the audit is the net until the build lands. |
+| 4 — a dense counter | Convention, as listed; the audit lists gaps. |
+| 5 — search filters | Convention, as listed. |
+| 6 — original time | **Holds, not a convention.** `Op-Ts` is the author-claimed clock on every operation; the import writes the original `at` there, and nothing goes in the data. |
+| 7 — tombstones | Convention, as listed. |
+| 8 — arrays in state | Holds, as listed. |

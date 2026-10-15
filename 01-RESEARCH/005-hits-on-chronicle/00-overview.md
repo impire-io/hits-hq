@@ -155,3 +155,19 @@ index and surface of HITS beside what chronicle offers for it, with the
 gap list at the end — the list chronicle-38's fourth ask wanted. The spike
 (question 12) has not run yet; it is the next step, and the mapping says
 which rows it has to check.
+
+**2026-10-15 — the gaps addressed** (Daan's direction). Checked against
+chronicle's code: an underscore is legal in an instance id, `Op-Ts` is an
+author-claimed time on every operation, the verified write refuses a
+header naming another author, and the fold judges nothing about the state
+an operation meets or leaves. Decision
+[0019](../../03-DECISIONS/0019-the-writer-is-the-client-the-store-does-not-require-verified-authors-and-a-release-lives-under-its-initiative.md)
+settles questions 3 and 6 and the release row of question 1: the writer
+is the client package under the guard, through the node; the store does
+not require verified authors and every live write is verified anyway; a
+migrated operation's author and time ride on `Op-Author` and `Op-Ts`; a
+release is a child of its initiative with its dots as underscores. The
+one ask, lifecycle rules, is chronicle-75 on chronicle's tracker — an
+operation may declare a precondition and the type's schema is the shape
+every state keeps — answered by chronicle-hq decision 0059 the same day.
+The spike is still the next step.
