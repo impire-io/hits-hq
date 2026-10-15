@@ -171,3 +171,16 @@ one ask, lifecycle rules, is chronicle-75 on chronicle's tracker — an
 operation may declare a precondition and the type's schema is the shape
 every state keeps — answered by chronicle-hq decision 0059 the same day.
 The spike is still the next step.
+
+**The spike ran 2026-10-15** ([`02-the-spike.md`](02-the-spike.md)),
+against chronicle 0.6.0: the model holds as mapped — the four types, the
+counter under the guard, the lifecycle with blocked-with-memory and the
+claim pair, the release child with its underscore id, the legacy id, one
+history-sourced search over report and trail, the graph from fields in
+both directions. The lifecycle gap was shown live: a transition out of a
+terminal status folded at sequence 11, which chronicle-hq 0059 answers.
+The history's time is `Op-Ts`, so a migrated operation shows its original
+time. One piece stays unproven: the corpus replay with the original
+author and time, which needs the Go client and is the next step before
+the cutover (question 9) is designed; questions 1 (the rest), 2, 4, 5, 7,
+8, 10 and 11 graduate from here.
