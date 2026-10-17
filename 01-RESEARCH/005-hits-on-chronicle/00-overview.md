@@ -184,3 +184,14 @@ time. One piece stays unproven: the corpus replay with the original
 author and time, which needs the Go client and is the next step before
 the cutover (question 9) is designed; questions 1 (the rest), 2, 4, 5, 7,
 8, 10 and 11 graduate from here.
+
+**The replay ran 2026-10-17** ([`03-the-replay.md`](03-the-replay.md)):
+the install's 940 operations, read from sequence 1, written into a
+chronicle store with their ids, actors and times on the record, derive to
+the install's own snapshot for every one of 134 items, 13 projects, 4
+initiatives and the release — 0 mismatches, every note's author and time
+equal, and 0 operations marked under the preconditions chronicle-hq
+decision 0059 makes possible (built on chronicle's `chronicle-75` branch).
+Question 9 is answered and nothing of the mapping is unproven; what
+remains is to decide and to design: questions 1 (the rest), 2, 4, 5, 7,
+8, 10 and 11.
