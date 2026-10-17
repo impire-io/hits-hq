@@ -1,10 +1,12 @@
 ---
-status: implemented
+status: abandoned
 code: hits
 updated: 2026-09-04
 ---
 
 # IDP auth & hits contexts — the client-side token exchange
+
+> **Retired.** Retired by [0021](../03-DECISIONS/0021-the-client-one-package-on-chronicle-the-sentences-and-the-tools-unchanged-contexts-are-chronicles.md) (2026-10-17): the connection is a chronicle context, dialled as chronicle's CLI dials it — `chronicle login` or `chronicle context add` ([`the-client.md`](the-client.md) § the connection). This document describes the install until the cutover of [0022](../03-DECISIONS/0022-where-hits-runs-and-the-cutover.md).
 
 How `hits` authenticates against an identity provider and keeps a NATS
 connection fed with a fresh access token — and, carrying it, **hits

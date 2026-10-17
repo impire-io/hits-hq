@@ -1,5 +1,6 @@
 ---
-status: active
+status: graduated
+became: ../../02-DESIGN/the-store.md
 ---
 
 # Research 005 — HITS on chronicle: the model mapped, the gaps named
@@ -195,3 +196,16 @@ decision 0059 makes possible (built on chronicle's `chronicle-75` branch).
 Question 9 is answered and nothing of the mapping is unproven; what
 remains is to decide and to design: questions 1 (the rest), 2, 4, 5, 7,
 8, 10 and 11.
+
+**Graduated 2026-10-17** by decisions
+[0020](../../03-DECISIONS/0020-the-store-four-types-their-preconditions-the-trail-as-history-and-three-indexes.md)
+(the store: questions 1, 2, 4, 5 and 11),
+[0021](../../03-DECISIONS/0021-the-client-one-package-on-chronicle-the-sentences-and-the-tools-unchanged-contexts-are-chronicles.md)
+(the client and the surfaces: questions 7 and 8) and
+[0022](../../03-DECISIONS/0022-where-hits-runs-and-the-cutover.md) (where
+it runs and the cutover: questions 6, 9 and 10), into the designs
+[`the-store.md`](../../02-DESIGN/the-store.md),
+[`the-client.md`](../../02-DESIGN/the-client.md) and
+[`the-cutover.md`](../../02-DESIGN/the-cutover.md); `item-model.md` and
+`mcp-server.md` amended, `ops-log.md`, `services.md`, `hits-up.md` and
+`idp-auth.md` retired. The build is handed to `hits` as release 0.8.0.

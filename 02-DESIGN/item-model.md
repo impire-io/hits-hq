@@ -13,12 +13,25 @@ become once the platform holds them — and, since the cutover (decision
 [0001](../03-DECISIONS/0001-item-store-architecture.md); the storage contract
 is [`ops-log.md`](ops-log.md), the surface is [`services.md`](services.md).
 
+**Amended by [0020](../03-DECISIONS/0020-the-store-four-types-their-preconditions-the-trail-as-history-and-three-indexes.md) and [0021](../03-DECISIONS/0021-the-client-one-package-on-chronicle-the-sentences-and-the-tools-unchanged-contexts-are-chronicles.md)** (2026-10-17): HITS runs on
+chronicle (decision [0018](../03-DECISIONS/0018-hits-runs-on-chronicle.md)).
+The model below stands unchanged in meaning; what changes is where it is
+kept and enforced — the store is [`the-store.md`](the-store.md), the
+writer is [`the-client.md`](the-client.md), and `ops-log.md` and
+`services.md` are retired. The amended passages: § identity (the counter
+is state under the guard), § invariants (chronicle refuses the lifecycle
+through declared preconditions, the client checks the rest), § bodies
+(a note's data is its text), § links (a map of paths), § releases (a
+child of its initiative).
+
 ## Identity
 
 An item's ID is initiative-prefixed: `<initiative>-<n>` — `hits-19`,
-`chronicle-hq-4` — with `n` minted atomically from that initiative's dense
-counter at creation ([`ops-log.md`](ops-log.md), decision
-[0016](../03-DECISIONS/0016-initiatives.md)). The item number is the
+`chronicle-hq-4` — with `n` minted from that initiative's dense counter at
+creation (decision [0016](../03-DECISIONS/0016-initiatives.md); since
+[0020](../03-DECISIONS/0020-the-store-four-types-their-preconditions-the-trail-as-history-and-three-indexes.md) the counter is the initiative's `next` in the store,
+advanced under chronicle's expected-sequence guard — [`the-store.md`](the-store.md)
+§ the counter). The item number is the
 trailing all-digit segment, unambiguous because an initiative slug is
 refused a trailing all-digit segment at registration. The ID carries the
 item's initiative — intrinsic from filing, immutable for life — and it is
@@ -90,8 +103,15 @@ view. It is never a way to remove a real item, closed or open.
 
 ## Invariants
 
-Enforced by `hits-node` before any op is appended; a command that would
-violate one is rejected, never partially applied.
+A command that would violate one is refused, never partially applied.
+Since [0020](../03-DECISIONS/0020-the-store-four-types-their-preconditions-the-trail-as-history-and-three-indexes.md) the lifecycle rules are **preconditions declared on
+the operations** and shapes stated in the type's schema, which chronicle
+refuses before a write is sent and marks when a bare writer gets them
+past; the rules a precondition cannot see — a registered project or
+release of the item's own initiative, the legacy initiative rule — the
+client checks before writing ([`the-client.md`](the-client.md) § the
+write loop). Before the port, `hits-node` enforced all of them before
+any op was appended.
 
 - Status transitions follow the lifecycle above; no transition leaves a
   terminal status.
@@ -125,7 +145,8 @@ violate one is rejected, never partially applied.
 
 The report — the symptom in plain terms and how it was observed — is part of
 the creation op. Everything after it is a **note**: an appended trail entry
-with an author and a timestamp. The diagnosis trail of a bug (hypotheses,
+with an author and a timestamp (on chronicle, the operation's own author
+and time; the note's data is its text — [0020](../03-DECISIONS/0020-the-store-four-types-their-preconditions-the-trail-as-history-and-three-indexes.md)). The diagnosis trail of a bug (hypotheses,
 evidence, dead ends — the old `01-diagnosis.md`) is its notes; so is closing
 reasoning on a `wontfix`. Notes are append-only: the trail is history, and
 history is not edited. Bodies are budgeted — 8 KiB each (decision
@@ -136,7 +157,9 @@ in the repo or the PR with its reference in the note.
 ## Links
 
 Links are typed, directed edges **between items**, asserted and retracted
-explicitly: `duplicates`, `relates-to`. The set grows by need, not by
+explicitly: `duplicates`, `relates-to` (kept on chronicle as a map from
+the link type to the linked items' paths, written whole under the guard
+— [0020](../03-DECISIONS/0020-the-store-four-types-their-preconditions-the-trail-as-history-and-three-indexes.md); every reference to another thing is its path there). The set grows by need, not by
 default. Links may reference items the reader has not seen yet; consumers
 tolerate that ([`ops-log.md`](ops-log.md)).
 

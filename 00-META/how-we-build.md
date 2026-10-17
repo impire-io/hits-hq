@@ -40,44 +40,47 @@ surfaces, never by default.
   deliberately, to that need. The guard is against speculative scope, not
   against doing the job completely.
 
-## The ops-log is the source of truth; everything else is a projection
+## The history is the record, and chronicle keeps it
 
 Every change to the system — an issue filed, claimed, blocked, resolved — is an
-event appended to the **ops-log**, a JetStream stream. That log is the single
-canonical record. Everything a caller reads is a *projection* of it, and every
-projection is derived, disposable, and rebuildable by replay.
+operation on an instance in a chronicle store, kept in its history. That
+history is the single canonical record. Everything a caller reads is derived
+from it — the state chronicle folds, the indexes it declares — and every
+derived view is disposable and rebuilt by replay. HITS keeps no stream, bucket
+or index of its own (decision [0018](../03-DECISIONS/0018-hits-runs-on-chronicle.md),
+restated at the graduation of research 005; before it, HITS ran the ops-log
+pattern by hand).
 
-- **Current state is a KV lookup.** A projection service consumes the ops-log
-  and maintains the current-state view in a KV store, so "what is the state of
-  issue N" is a cheap read, never a fold over history at request time.
+- **Current state is chronicle's state.** "What is the state of item N" is one
+  read of the instance, never a fold at request time; the trail is the
+  instance's history.
 
-- **Query views are in-process projections.** Fast lookups the client API needs
-  — full-text search, semantic search, relations — live as embedded, in-memory
-  or in-process indexes (Bleve, an embedded vector or graph store) built from
-  the same log. They are caches with a rebuild story, not stores with authority.
+- **Query views are declared indexes.** Full-text search, semantic search and
+  relations are chronicle's search, semantic and graph kinds, declared on the
+  store and derived from the same history. They are views with a rebuild
+  story, not stores with authority.
 
-- **No projection is written directly.** Writes go through the log; readers go
-  through projections. A projection that disagrees with the log is wrong by
-  definition, and fixing it is a replay, not a patch.
+- **Nothing is written but operations.** A write is an operation applied to an
+  instance under chronicle's guard, carrying the difference the model's own
+  fold produced; the lifecycle's rules are preconditions chronicle refuses.
+  A view that disagrees with the history is wrong by definition, and fixing
+  it is chronicle's replay, not a patch.
 
-## Every component is a NATS micro service
+## HITS runs no service of its own; every surface is a client
 
-All components of the solution are NATS micro services — the projector, the
-client API, and anything an install adds. One mechanical shape, whatever the
-job.
+The store, its state and its indexes run wherever chronicle runs — the
+operator's own NATS with chronicle's node, or the hosted account. What HITS
+ships is clients: the `hits` CLI and the `hits-mcp` server, each a caller of
+the one `client` package, each connecting through a chronicle context.
 
-- **Discoverable and manageable by construction.** Every service answers the
-  standard micro discovery surface and exposes management endpoints alongside
-  its functional ones. Finding what is running, and how it is doing, is a
-  platform property — not something each service reinvents.
+- **Nothing to run, nothing to discover.** There is no projector, no index
+  service and no fleet to compose; `hits store init` declares the store, and
+  the declarations are the deployment.
 
-- **Subscription is the capability declaration.** An instance serves what it
-  subscribes to; adding capacity or capability is starting a process, not
-  editing a router.
-
-- **NATS is the only transport at the core.** There is no HTTP-first parallel
-  surface. Anything that needs another protocol — the MCP server included —
-  is a client or adapter *on* the NATS surface, not a second front door.
+- **NATS stays the only transport.** The client speaks chronicle's wire —
+  JetStream for what is at rest, chronicle's verbs for the writes and the
+  queries. Anything that needs another protocol — the MCP server included —
+  is an adapter on the client, not a second front door.
 
 ## Headless: the client API is the product surface
 

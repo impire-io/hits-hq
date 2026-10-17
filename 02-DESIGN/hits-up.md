@@ -1,10 +1,12 @@
 ---
-status: implemented
+status: abandoned
 code: hits
 updated: 2026-09-04
 ---
 
 # `hits up` — the fleet as one process
+
+> **Retired.** Retired by [0022](../03-DECISIONS/0022-where-hits-runs-and-the-cutover.md) (2026-10-17): nothing runs — `hits store init` declares the store in a chronicle account ([`the-cutover.md`](the-cutover.md)). This document describes the install until the cutover.
 
 The getting-started shape: the whole service fleet running as one process
 inside the one `hits` binary, against whatever NATS system a context — or
