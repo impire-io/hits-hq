@@ -1,11 +1,13 @@
 ---
-status: implemented
+status: abandoned
 code: hits
 updated: 2026-09-14
 lands:
 ---
 
 # The ops-log
+
+> **Retired.** Retired by [0020](../03-DECISIONS/0020-the-store-four-types-their-preconditions-the-trail-as-history-and-three-indexes.md) (2026-10-17): the stream, the envelope, the subjects and the state projection are chronicle's — [`the-store.md`](the-store.md). This document describes the install until the cutover of [0022](../03-DECISIONS/0022-where-hits-runs-and-the-cutover.md).
 
 The single canonical record of the HITS platform: every change to every item
 is an op appended here, and everything a caller reads is a projection of it

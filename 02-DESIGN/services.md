@@ -1,11 +1,13 @@
 ---
-status: implemented
+status: abandoned
 code: hits
 updated: 2026-09-14
 lands:
 ---
 
 # The service fleet
+
+> **Retired.** Retired by [0021](../03-DECISIONS/0021-the-client-one-package-on-chronicle-the-sentences-and-the-tools-unchanged-contexts-are-chronicles.md) (2026-10-17): HITS runs no service of its own — the store and the indexes are chronicle's, the surfaces are clients ([`the-client.md`](the-client.md)). This document describes the install until the cutover of [0022](../03-DECISIONS/0022-where-hits-runs-and-the-cutover.md).
 
 Four binaries, four NATS micro services, one repo. Settled by decision
 [0001](../03-DECISIONS/0001-item-store-architecture.md); the data they carry

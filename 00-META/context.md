@@ -24,6 +24,9 @@ A deviation without a written defense is not a valid decision.
 
 Environment facts not yet settled, listed so designs don't silently assume an answer:
 
-- **Identity** — how humans and agents authenticate, and how an action is attributed to a principal.
+- **Identity** — answered by decision [0021](../03-DECISIONS/0021-the-client-one-package-on-chronicle-the-sentences-and-the-tools-unchanged-contexts-are-chronicles.md):
+  chronicle's — a person is a member by GitHub login, an agent a service
+  account, and every write's author is the connection's principal, vouched
+  for by chronicle.
 - **Deployment target** — where HITS runs when it first runs anywhere.
 - **Data residency / compliance** — none imposed today; revisit at first external deployment.

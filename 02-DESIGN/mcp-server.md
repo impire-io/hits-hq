@@ -12,6 +12,11 @@ agents as tools. Settled by decision
 [`services.md`](services.md), the data those tools carry is
 [`item-model.md`](item-model.md).
 
+**Amended by [0021](../03-DECISIONS/0021-the-client-one-package-on-chronicle-the-sentences-and-the-tools-unchanged-contexts-are-chronicles.md)** (2026-10-17): the server fronts the `client`
+package on chronicle ([`the-client.md`](the-client.md)) — the fleet it
+reached is gone, the connection is a chronicle context, and the actor is
+the context's principal; the tool surface is unchanged.
+
 It is a client of the service fleet, never a peer: it serves no NATS
 endpoints, subscribes to nothing, and owns no projection. Everything it can
 do goes through the `client` package, and nothing is callable that is not
@@ -20,11 +25,13 @@ part of the client surface (how-we-build § headless).
 ```mermaid
 flowchart LR
     A[agent] <-->|MCP over stdio| M[hits-mcp]
-    M -->|hits.api.*| N[hits-node]
-    M -->|hits.search.*| S[hits-index-search]
-    M -->|hits.semantic.*| E[hits-index-semantic]
-    M -->|hits.graph.*| G[hits-index-graph]
+    M --> C[client package]
+    C -->|a chronicle context| S[(store hits, its indexes)]
 ```
+
+(Before [0021](../03-DECISIONS/0021-the-client-one-package-on-chronicle-the-sentences-and-the-tools-unchanged-contexts-are-chronicles.md) the server spoke to the four services of
+[`services.md`](services.md) on `hits.api.*`, `hits.search.*`,
+`hits.semantic.*` and `hits.graph.*`.)
 
 ## Shape
 
@@ -87,9 +94,12 @@ its own: the names an agent reads in a tool schema are the names in
 
 ## Actor
 
-The acting handle is server configuration, required at startup — a flag or
-`HITS_ACTOR`, the CLI's convention — validated for form at boot and stamped
-on every write. Tools carry no actor parameter and no override: one process
+Since [0021](../03-DECISIONS/0021-the-client-one-package-on-chronicle-the-sentences-and-the-tools-unchanged-contexts-are-chronicles.md) the actor is the chronicle context's principal — a
+person's GitHub login, an agent's service-account name — stamped and
+vouched for by chronicle on every write; the server takes no actor flag.
+Before the port, the acting handle was server configuration, required at
+startup — a flag or `HITS_ACTOR`, the CLI's convention — validated for
+form at boot and stamped on every write. Tools carry no actor parameter and no override: one process
 is one actor. The default initiative is the same shape, optional: a startup
 flag mirroring the CLI's selected initiative, feeding `create_item` when
 the call names none (decision

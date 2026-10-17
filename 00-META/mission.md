@@ -15,4 +15,4 @@ There is no UI at the core. The action surface is the API, exposed to agents thr
 - **Headless first** — the API is the product. Every capability exists as a callable surface before any screen shows it; human views are derived, downstream, and replaceable.
 - **Agent-native** — the primary operator is an agent acting through MCP. Humans direct, review, and consume; agents do the recording as part of doing the work.
 - **Nothing is lost** — every change is an event on the ops-log. Current state is a projection of history, history is replayable, and every action is traceable to who did it and why.
-- **Simple to operate** — discoverable micro services with management endpoints, and derived state that can always be rebuilt. Losing a projection is a replay, not an incident.
+- **Simple to operate** — nothing to run: a HITS is declarations in a chronicle store and clients on it, and every derived view is chronicle's to rebuild. Losing a view is a replay, not an incident.
