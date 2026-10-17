@@ -1,5 +1,7 @@
 ---
-status: designed
+status: in-progress
+code: hits
+updated: 2026-10-17
 ---
 
 # Where HITS runs, and the cutover
