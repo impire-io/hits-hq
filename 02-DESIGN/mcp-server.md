@@ -1,7 +1,7 @@
 ---
-status: implemented
+status: in-progress
 code: hits
-updated: 2026-09-14
+updated: 2026-10-18
 ---
 
 # The MCP server — `hits-mcp`
@@ -16,6 +16,11 @@ agents as tools. Settled by decision
 package on chronicle ([`the-client.md`](the-client.md)) — the fleet it
 reached is gone, the connection is a chronicle context, and the actor is
 the context's principal; the tool surface is unchanged.
+
+**Amended by [0023](../03-DECISIONS/0023-the-client-speaks-two-substrates-chronicle-and-the-0-7-fleet-frozen-at-its-release-chosen-by-the-context.md)** (2026-10-18): the context may also be a hits context
+of a fleet frozen at the v0.7.0 release; on one the startup actor returns
+as it was, on a chronicle context it is refused. The tool surface is
+still unchanged.
 
 It is a client of the service fleet, never a peer: it serves no NATS
 endpoints, subscribes to nothing, and owns no projection. Everything it can
@@ -37,10 +42,11 @@ flowchart LR
 
 One process per agent, on the agent's machine, spoken to over stdio. On the
 NATS side it is exactly what the CLI is: a caller resolving its connection
-through a NATS context. Startup is fail-fast — resolve the context,
-connect, ping the `hits` service, and only then serve MCP. A server that
-cannot reach the fleet refuses to start instead of exposing tools that
-cannot work.
+through a context — chronicle's, or a hits context (decision 0023).
+Startup is fail-fast — resolve the context, connect, read what answers
+(the store's types on chronicle, the node's ping on the fleet), and only
+then serve MCP. A server that cannot reach either refuses to start
+instead of exposing tools that cannot work.
 
 The server is stateless: no cache, no queue, no retry beyond what a single
 request carries. Every tool call is one client call; the fleet's answers
@@ -96,11 +102,14 @@ its own: the names an agent reads in a tool schema are the names in
 
 Since [0021](../03-DECISIONS/0021-the-client-one-package-on-chronicle-the-sentences-and-the-tools-unchanged-contexts-are-chronicles.md) the actor is the chronicle context's principal — a
 person's GitHub login, an agent's service-account name — stamped and
-vouched for by chronicle on every write; the server takes no actor flag.
-Before the port, the acting handle was server configuration, required at
-startup — a flag or `HITS_ACTOR`, the CLI's convention — validated for
-form at boot and stamped on every write. Tools carry no actor parameter and no override: one process
-is one actor. The default initiative is the same shape, optional: a startup
+vouched for by chronicle on every write; on a chronicle context the
+server refuses an actor flag. On a hits context (decision 0023) the
+acting handle is what it was before the port: server configuration,
+required at startup — a flag or `HITS_ACTOR`, the CLI's convention —
+validated for form at boot and stamped on every write, because the 0.7
+node validates a claimed actor and chronicle vouches for nobody there.
+Tools carry no actor parameter and no override: one process is one
+actor. The default initiative is the same shape, optional: a startup
 flag mirroring the CLI's selected initiative, feeding `create_item` when
 the call names none (decision
 [0016](../03-DECISIONS/0016-initiatives.md)) — a filing default, never a

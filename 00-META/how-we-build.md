@@ -71,11 +71,14 @@ pattern by hand).
 The store, its state and its indexes run wherever chronicle runs — the
 operator's own NATS with chronicle's node, or the hosted account. What HITS
 ships is clients: the `hits` CLI and the `hits-mcp` server, each a caller of
-the one `client` package, each connecting through a chronicle context.
+the one `client` package, each connecting through a context — chronicle's,
+or a hits context of a fleet frozen at the v0.7.0 release, which HITS still
+speaks to and no longer builds (decision
+[0023](../03-DECISIONS/0023-the-client-speaks-two-substrates-chronicle-and-the-0-7-fleet-frozen-at-its-release-chosen-by-the-context.md)).
 
 - **Nothing to run, nothing to discover.** There is no projector, no index
-  service and no fleet to compose; `hits store init` declares the store, and
-  the declarations are the deployment.
+  service and no fleet to compose or to fix; `hits store init` declares the
+  store, and the declarations are the deployment.
 
 - **NATS stays the only transport.** The client speaks chronicle's wire —
   JetStream for what is at rest, chronicle's verbs for the writes and the

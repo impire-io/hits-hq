@@ -1,7 +1,7 @@
 ---
 status: implemented
 code: hits
-updated: 2026-10-17
+updated: 2026-10-18
 ---
 
 # Where HITS runs, and the cutover
@@ -12,6 +12,11 @@ mark the move. Settled by decision [0022](../03-DECISIONS/0022-where-hits-runs-a
 the store is [`the-store.md`](the-store.md), the client is
 [`the-client.md`](the-client.md), the replay's proof is research
 [005](../01-RESEARCH/005-hits-on-chronicle/03-the-replay.md).
+
+**Amended by [0023](../03-DECISIONS/0023-the-client-speaks-two-substrates-chronicle-and-the-0-7-fleet-frozen-at-its-release-chosen-by-the-context.md)** (2026-10-18): a 0.7 fleet an operator keeps running,
+frozen at its release, stays reachable through a hits context; the
+release that was to remove `hits migrate` is retired, and the
+two-substrate client is 0.10.0.
 
 ## The account
 
@@ -24,6 +29,11 @@ lives in the hosted account `impire`**: its members are the people who
 file, by GitHub login, invited by its admin; its service accounts are the
 agents that act, each with a credential handed down once. The hosted
 environment hosts nothing of HITS — no binary, no unit, no page.
+
+A fleet of release 0.7.0 that an operator keeps running is not a HITS on
+chronicle: it is reachable through a hits context
+([`the-client.md`](the-client.md)), it gets no fix, and it moves by the
+replay below when its operator decides.
 
 ## `hits store init`
 
@@ -65,20 +75,26 @@ is a new item on the new install, never a reason to revive the old one.
 
 ## The releases
 
-Two, registered under [0017](../03-DECISIONS/0017-release-targeting.md):
+Registered under [0017](../03-DECISIONS/0017-release-targeting.md), as
+decision 0023 amended them:
 
-- **`hits 0.8.0`** — the client on chronicle ([`the-client.md`](the-client.md)),
-  the fleet gone, `hits store init`, `hits migrate`, the install
-  manifest. Cut when the build lands; shipped with the cutover's reads
-  as its evidence, since the cutover is the first live use of it.
-- **`hits 0.9.0`** — `hits migrate` removed, its one use spent.
+- **`hits 0.8.0`** and **`hits 0.8.1`** — the client on chronicle
+  ([`the-client.md`](the-client.md)), the fleet gone, `hits store init`,
+  `hits migrate`, the install manifest; 0.8.1 adds the dial's fallback to
+  the store `hits`. Cut when the build landed (2026-10-17); shipped with
+  the cutover's reads as their evidence, since the cutover is the first
+  live use of them.
+- **`hits 0.9.0`** — retired, never cut: it was to remove `hits migrate`,
+  and the migration's use is not spent while a 0.7 fleet exists.
+- **`hits 0.10.0`** — the client on both substrates; `hits migrate` stays
+  in it.
 
-Items that must land in the port target `0.8.0`; nothing targets `0.9.0`
-but the removal.
+Items that must land in the port target `0.8.0`; the two-substrate client
+targets `0.10.0`.
 
 ## What this does not do
 
 No dual-write transition, no second record of the tracker, no cutover a
 machine runs on its own. No account per project, no store per
-initiative. No hosted HITS of any kind. No `migrate` beyond the release
-that needs it.
+initiative. No hosted HITS of any kind. No `migrate` once no 0.7 fleet
+needs it.
